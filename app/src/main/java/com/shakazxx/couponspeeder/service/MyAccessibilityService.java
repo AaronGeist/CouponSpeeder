@@ -1,12 +1,19 @@
 package com.shakazxx.couponspeeder.service;
 
 import android.accessibilityservice.AccessibilityService;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.shakazxx.couponspeeder.core.party.ArticleReader;
 import com.shakazxx.couponspeeder.core.party.VideoReader;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
 
@@ -30,6 +37,8 @@ public class MyAccessibilityService extends AccessibilityService {
 
         articleReader = new ArticleReader(this);
         videoReader = new VideoReader(this);
+
+        lightScreen();
     }
 
     @Override
@@ -68,19 +77,34 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     private void processArticle() {
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         if (articleReader.findEntrance("学习")) {
-            if (articleReader.findEntrance("要闻")) {
-                articleReader.loop("“学习强国”学习平台", "欢迎发表你的观点");
+            if (articleReader.findEntrance("推荐")) {
+                articleReader.loop(date, "欢迎发表你的观点");
             }
         }
     }
 
     private void processVideo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        @SuppressLint("SimpleDateFormat")
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
         if (videoReader.findEntrance("视听学习")) {
-            videoReader.loop("央视网", "欢迎发表你的观点");
+            if (articleReader.findEntrance("联播频道")) {
+                videoReader.loop(date, "欢迎发表你的观点");
+            }
         }
     }
 
+    // 点亮亮屏
+    private void lightScreen() {
+        PowerManager mPowerManager = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock mWakeLock = mPowerManager.newWakeLock
+                (PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
+        mWakeLock.acquire(10 * 1000);
+    }
 
     @Override
     public void onInterrupt() {

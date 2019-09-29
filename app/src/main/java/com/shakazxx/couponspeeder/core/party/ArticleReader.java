@@ -12,7 +12,7 @@ import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BA
 
 public class ArticleReader extends BaseLearner {
 
-    private int articleScrollDownTimes = 120;  //下滑次数
+    private int articleScrollDownTimes = 125;  //下滑次数
 
     private int maxMarkCnt = 2;
     private int markCnt = 0;
@@ -25,7 +25,7 @@ public class ArticleReader extends BaseLearner {
     }
 
     @Override
-    void processEntry() {
+    boolean processEntry(String title) {
         postProcessHook();
 
         int scrollLength = 1000;
@@ -38,6 +38,8 @@ public class ArticleReader extends BaseLearner {
             } catch (InterruptedException e) {
             }
         }
+
+        return true;
     }
 
     private void postProcessHook() {

@@ -89,10 +89,11 @@ public abstract class BaseLearner {
                             List<AccessibilityNodeInfo> inners = newRoot.findAccessibilityNodeInfosByText(innerKeyword);
                             if (inners.size() > 0) {
                                 Log.d(TAG, "进入单项");
-                                processEntry();
+                                if (processEntry(title)) {
+                                    totalCnt++;
+                                }
                                 accessibilityService.performGlobalAction(GLOBAL_ACTION_BACK);
                                 sleep(1000);
-                                totalCnt++;
 
                                 if (totalCnt >= getRequiredEntryCnt()) {
                                     break;
@@ -124,7 +125,7 @@ public abstract class BaseLearner {
     }
 
     // 进入单项后如何处理
-    abstract void processEntry();
+    abstract boolean processEntry(String title);
 
     // 需要学习的数量
     abstract int getRequiredEntryCnt();
