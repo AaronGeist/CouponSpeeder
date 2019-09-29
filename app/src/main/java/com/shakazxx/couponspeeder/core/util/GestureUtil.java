@@ -22,4 +22,18 @@ public class GestureUtil {
 
         service.dispatchGesture(gestureDescription, null, null);
     }
+
+    public static void click(AccessibilityService service, int x, int y) {
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+
+        Path path = new Path();
+
+        path.moveTo(x, y);
+
+        GestureDescription gestureDescription = builder
+                .addStroke(new GestureDescription.StrokeDescription(path, 1L, 1L, false))
+                .build();
+
+        service.dispatchGesture(gestureDescription, null, null);
+    }
 }

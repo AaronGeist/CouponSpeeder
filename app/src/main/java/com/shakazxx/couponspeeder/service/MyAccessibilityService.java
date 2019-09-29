@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.shakazxx.couponspeeder.core.party.ArticleReader;
+import com.shakazxx.couponspeeder.core.party.Login;
 import com.shakazxx.couponspeeder.core.party.VideoReader;
 
 import java.text.SimpleDateFormat;
@@ -23,6 +24,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private ArticleReader articleReader;
     private VideoReader videoReader;
+    private Login login;
 
     /**************************
      * 启动应用   adb shell am start -n cn.xuexi.android/com.alibaba.android.rimet.biz.SplashActivity
@@ -31,10 +33,12 @@ public class MyAccessibilityService extends AccessibilityService {
 
 
     @Override
+
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
 
+        login = new Login(this);
         articleReader = new ArticleReader(this);
         videoReader = new VideoReader(this);
 
@@ -68,6 +72,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
         switch (eventType) {
             case TYPE_WINDOW_CONTENT_CHANGED:
+                login.process();
                 processArticle();
                 processVideo();
                 break;
