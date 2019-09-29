@@ -5,4 +5,5 @@
     android:canRetrieveWindowContent="true"
     android:description="@string/readme"
     android:notificationTimeout="100"
-    android:packageNames="cmb.pb,com.cmbchina.ccd.pluto.cmbActivity"/>
+    android:canPerformGestures="true"
+    android:packageNames="com.cmbchina.ccd.pluto.cmbActivity,cn.xuexi.android"/>
