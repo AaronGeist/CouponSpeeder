@@ -7,8 +7,10 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.List;
+import java.util.Random;
 
 import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK;
+import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class ArticleReader extends BaseLearner {
 
@@ -20,6 +22,8 @@ public class ArticleReader extends BaseLearner {
     private int maxShareCnt = 2;
     private int shareCnt = 0;
 
+    private Random r = new Random();
+
     public ArticleReader(AccessibilityService service) {
         super(service);
     }
@@ -28,10 +32,8 @@ public class ArticleReader extends BaseLearner {
     boolean processEntry(String title) {
         postProcessHook();
 
-        int scrollLength = 1000;
-
         for (int i = 0; i < articleScrollDownTimes; i++) {
-            GestureUtil.scrollDown(accessibilityService, scrollLength);
+            GestureUtil.scrollDown(accessibilityService, r.nextInt(200) + 800);
             Log.d(TAG, ">>>>> down " + i);
             try {
                 Thread.sleep(1000);
@@ -44,6 +46,9 @@ public class ArticleReader extends BaseLearner {
 
     private void postProcessHook() {
         AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
+        if (root == null) {
+            return;
+        }
         List<AccessibilityNodeInfo> elements = root.findAccessibilityNodeInfosByText("欢迎发表你的观点");
         if (elements.size() > 0) {
             AccessibilityNodeInfo element = elements.get(0);
@@ -65,6 +70,9 @@ public class ArticleReader extends BaseLearner {
                 shareBtn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 sleep(3000);
                 AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
+                if (newRoot == null) {
+                    return;
+                }
                 List<AccessibilityNodeInfo> newElems = newRoot.findAccessibilityNodeInfosByText("分享到学习强国");
                 if (newElems.size() > 0) {
                     newElems.get(0).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);

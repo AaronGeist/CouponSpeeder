@@ -1,6 +1,7 @@
 package com.shakazxx.couponspeeder.core.party;
 
 import android.accessibilityservice.AccessibilityService;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK;
+import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public abstract class BaseLearner {
 
@@ -75,6 +77,14 @@ public abstract class BaseLearner {
             List<AccessibilityNodeInfo> entries = root.findAccessibilityNodeInfosByText(keyword);
             if (entries.size() > 0) {
                 for (AccessibilityNodeInfo entry : entries) {
+
+                    // 屏幕外的部分不要
+                    Rect rect = new Rect();
+                    entry.getBoundsInScreen(rect);
+                    if (rect.left < 0 || rect.right < 0) {
+                        continue;
+                    }
+
                     AccessibilityNodeInfo btn = entry.getParent();
                     String title = btn.getChild(0).getText().toString();
                     if (!readTitles.contains(title)) {
@@ -114,14 +124,6 @@ public abstract class BaseLearner {
 
         //学习结束
         enable = false;
-    }
-
-    protected void sleep(long mills) {
-        try {
-            Thread.sleep(mills);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     // 进入单项后如何处理

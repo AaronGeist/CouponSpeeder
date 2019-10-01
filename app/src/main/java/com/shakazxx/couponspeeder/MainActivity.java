@@ -1,7 +1,5 @@
 package com.shakazxx.couponspeeder;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -9,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.shakazxx.couponspeeder.service.MyAccessibilityService;
 

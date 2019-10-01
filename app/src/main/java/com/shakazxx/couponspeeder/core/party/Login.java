@@ -11,6 +11,8 @@ import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.List;
 
+import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
+
 public class Login {
 
     private AccessibilityService accessibilityService;
@@ -56,13 +58,5 @@ public class Login {
         }
 
         return false;
-    }
-
-    protected void sleep(long mills) {
-        try {
-            Thread.sleep(mills);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
