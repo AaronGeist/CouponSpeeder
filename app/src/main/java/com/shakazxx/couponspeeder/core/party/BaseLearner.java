@@ -78,40 +78,43 @@ public abstract class BaseLearner {
             if (entries.size() > 0) {
                 for (AccessibilityNodeInfo entry : entries) {
 
-                    // 屏幕外的部分不要
-                    Rect rect = new Rect();
-                    entry.getBoundsInScreen(rect);
-                    if (rect.left < 0 || rect.right < 0) {
-                        continue;
-                    }
-
-                    AccessibilityNodeInfo btn = entry.getParent();
-                    String title = btn.getChild(0).getText().toString();
-                    if (!readTitles.contains(title)) {
-                        // 发现不重复项
-                        Log.d(TAG, "当前标题: " + title);
-                        readTitles.add(title);
-                        sleep(1000);
-                        if (btn.isClickable()) {
-                            btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-
-                            AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
-                            List<AccessibilityNodeInfo> inners = newRoot.findAccessibilityNodeInfosByText(innerKeyword);
-                            if (inners.size() > 0) {
-                                Log.d(TAG, "进入单项");
-                                if (processEntry(title)) {
-                                    totalCnt++;
-                                }
-                                accessibilityService.performGlobalAction(GLOBAL_ACTION_BACK);
-                                sleep(1000);
-
-                                if (totalCnt >= getRequiredEntryCnt()) {
-                                    break;
-                                }
-                            }
-                        } else {
-                            Log.e(TAG, "无法点击进入: " + title);
+                    try {
+                        // 屏幕外的部分不要
+                        Rect rect = new Rect();
+                        entry.getBoundsInScreen(rect);
+                        if (rect.left < 0 || rect.right < 0) {
+                            continue;
                         }
+
+                        AccessibilityNodeInfo btn = entry.getParent();
+                        String title = btn.getChild(0).getText().toString();
+                        if (!readTitles.contains(title)) {
+                            // 发现不重复项
+                            Log.d(TAG, "当前标题: " + title);
+                            readTitles.add(title);
+                            sleep(1000);
+                            if (btn.isClickable()) {
+                                btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+
+                                AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
+                                List<AccessibilityNodeInfo> inners = newRoot.findAccessibilityNodeInfosByText(innerKeyword);
+                                if (inners.size() > 0) {
+                                    Log.d(TAG, "进入单项");
+                                    if (processEntry(title)) {
+                                        totalCnt++;
+                                    }
+                                    accessibilityService.performGlobalAction(GLOBAL_ACTION_BACK);
+                                    sleep(1000);
+
+                                    if (totalCnt >= getRequiredEntryCnt()) {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                Log.e(TAG, "无法点击进入: " + title);
+                            }
+                        }
+                    } catch (Exception e) {
                     }
                 }
             }

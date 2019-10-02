@@ -4,6 +4,9 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.graphics.Path;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GestureUtil {
 
     public static void scrollDown(AccessibilityService service, int distance) {
@@ -53,7 +56,7 @@ public class GestureUtil {
         service.dispatchGesture(gestureDescription, null, null);
     }
 
-    public static void click(AccessibilityService service, int x, int y) {
+    public static void click(AccessibilityService service, int x, int y, int delayTime) {
         GestureDescription.Builder builder = new GestureDescription.Builder();
 
         Path path = new Path();
@@ -61,8 +64,42 @@ public class GestureUtil {
         path.moveTo(x, y);
 
         GestureDescription gestureDescription = builder
-                .addStroke(new GestureDescription.StrokeDescription(path, 1L, 1L, false))
+                .addStroke(new GestureDescription.StrokeDescription(path, 0L, 1L, false))
                 .build();
+
+        service.dispatchGesture(gestureDescription, null, null);
+
+        if (delayTime > 0) {
+            CommonUtil.sleep(delayTime);
+        }
+    }
+
+    public static void drawLine(AccessibilityService service, List<List<Integer>> paths) {
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+
+
+        List<GestureDescription.StrokeDescription> strokeDescriptions = new ArrayList<>();
+        for (List<Integer> line : paths) {
+            Path path = new Path();
+
+            path.moveTo(line.get(0), line.get(1));
+            path.lineTo(line.get(0) + line.get(2), line.get(1) + line.get(3));
+
+            GestureDescription.StrokeDescription strokeDescription;
+            if (strokeDescriptions.size() == 0) {
+                strokeDescription = new GestureDescription.
+                        StrokeDescription(path, 0, 1000L, true);
+            } else {
+                GestureDescription.StrokeDescription preStroke = strokeDescriptions.get(strokeDescriptions.size() - 1);
+                strokeDescription = preStroke.continueStroke(path, 0, 1000L, true);
+            }
+
+            builder.addStroke(strokeDescription);
+            strokeDescriptions.add(strokeDescription);
+
+        }
+
+        GestureDescription gestureDescription = builder.build();
 
         service.dispatchGesture(gestureDescription, null, null);
     }

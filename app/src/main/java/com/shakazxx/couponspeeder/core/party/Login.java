@@ -7,11 +7,10 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.List;
-
-import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class Login {
 
@@ -43,15 +42,13 @@ public class Login {
         if (nodes.size() > 0) {
             AccessibilityNodeInfo btn = nodes.get(0);
             if (btn.isClickable()) {
-                btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                sleep(1000);
+                CommonUtil.click(btn, 3000);
 
                 WindowManager wm = (WindowManager) accessibilityService.getSystemService(Context.WINDOW_SERVICE);
                 DisplayMetrics dm = new DisplayMetrics();
                 wm.getDefaultDisplay().getMetrics(dm);
 
-                GestureUtil.click(accessibilityService, dm.widthPixels - 10, dm.heightPixels - 10);
-                sleep(1000);
+                GestureUtil.click(accessibilityService, dm.widthPixels - 20, dm.heightPixels - 20, 1000);
 
                 return true;
             }

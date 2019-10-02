@@ -6,4 +6,4 @@
     android:description="@string/readme"
     android:notificationTimeout="100"
     android:canPerformGestures="true"
-    android:packageNames="com.cmbchina.ccd.pluto.cmbActivity,cn.xuexi.android"/>
+    android:packageNames="cmb.pb,cn.xuexi.android,com.spdbccc.app,com.cmbchina.ccd.pluto.cmbActivity"/>
