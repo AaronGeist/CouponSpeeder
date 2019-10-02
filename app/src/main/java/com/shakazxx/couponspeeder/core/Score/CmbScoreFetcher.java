@@ -8,8 +8,6 @@ import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.List;
 
-import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
-
 public class CmbScoreFetcher extends BaseScoreFetcher {
 
     public CmbScoreFetcher(AccessibilityService service) {

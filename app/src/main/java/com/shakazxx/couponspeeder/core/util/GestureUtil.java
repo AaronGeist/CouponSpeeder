@@ -35,7 +35,7 @@ public class GestureUtil {
         path.lineTo(x += distance, y);
 
         GestureDescription gestureDescription = builder
-                .addStroke(new GestureDescription.StrokeDescription(path, 200L, 800L, false))
+                .addStroke(new GestureDescription.StrokeDescription(path, 20L, 800L, false))
                 .build();
 
         service.dispatchGesture(gestureDescription, null, null);

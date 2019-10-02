@@ -6,10 +6,7 @@ import android.graphics.Path;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
-import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SpdccScoreFetcher extends BaseScoreFetcher {

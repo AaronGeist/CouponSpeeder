@@ -12,7 +12,7 @@ import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class VideoReader extends BaseLearner {
 
-    private int videoReadTimeInSecondsLeft = 185 * getRequiredEntryCnt();  //视频观看秒数
+    private int videoReadTimeInSecondsLeft = 180 * getRequiredEntryCnt();  //视频观看秒数
 
     private Random r = new Random();
 
@@ -58,9 +58,9 @@ public class VideoReader extends BaseLearner {
                 }
 
                 // 没结束？快进
-                int x = r.nextInt(50) + 250;
-                int y = r.nextInt(50) + 250;
-                GestureUtil.scrollRight(accessibilityService, x, y, 150);
+                int x = r.nextInt(10) + 200;
+                int y = r.nextInt(50) + 400;
+                GestureUtil.scrollRight(accessibilityService, x, y, 400);
 
                 sleep(r.nextInt(1000) + 1000);
             }
