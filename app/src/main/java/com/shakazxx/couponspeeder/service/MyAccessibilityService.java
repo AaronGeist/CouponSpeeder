@@ -10,7 +10,9 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.shakazxx.couponspeeder.core.Score.CmbScoreFetcher;
 import com.shakazxx.couponspeeder.core.Score.SpdccScoreFetcher;
-import com.shakazxx.couponspeeder.core.party.PartyLearner;
+import com.shakazxx.couponspeeder.core.alipay.AlipayScore;
+import com.shakazxx.couponspeeder.core.party.PartyStudent;
+import com.shakazxx.couponspeeder.core.wechat.WechatScore;
 
 import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
 
@@ -18,15 +20,11 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private static final String TAG = MyAccessibilityService.class.getSimpleName();
 
-    private PartyLearner partyLearner;
+    private PartyStudent partyStudent;
     private CmbScoreFetcher cmbScoreFetcher;
     private SpdccScoreFetcher spdccScoreFetcher;
-
-    /**************************
-     * 启动应用   adb shell am start -n cn.xuexi.android/com.alibaba.android.rimet.biz.SplashActivity
-     * 应用关闭   adb shell am force-stop cn.xuexi.android
-     **************************/
-
+    private WechatScore wechatScore;
+    private AlipayScore alipayScore;
 
     @Override
 
@@ -34,9 +32,11 @@ public class MyAccessibilityService extends AccessibilityService {
         super.onCreate();
         Log.d(TAG, "onCreate");
 
-        partyLearner = new PartyLearner(this);
+        partyStudent = new PartyStudent(this);
         cmbScoreFetcher = new CmbScoreFetcher(this);
         spdccScoreFetcher = new SpdccScoreFetcher(this);
+        wechatScore = new WechatScore(this);
+        alipayScore = new AlipayScore(this);
 
         lightScreen();
     }
@@ -73,18 +73,33 @@ public class MyAccessibilityService extends AccessibilityService {
         String className = event.getClassName().toString();
         Log.d(TAG, String.format("pkg=%s, cls=%s, event=%s", packageName, className, eventType));
 
+
         switch (eventType) {
             case TYPE_WINDOW_CONTENT_CHANGED:
                 if (packageName.equalsIgnoreCase("cn.xuexi.android")) {
-                    partyLearner.learn();
+                    partyStudent.learn();
+                    return;
                 }
 
                 if (packageName.equalsIgnoreCase("cmb.pb")) {
                     cmbScoreFetcher.fetch();
+                    return;
                 }
 
                 if (packageName.equalsIgnoreCase("com.spdbccc.app")) {
                     spdccScoreFetcher.fetch();
+                    return;
+                }
+
+                if (packageName.equalsIgnoreCase("com.tencent.mm")) {
+                    wechatScore.pbcc();
+                    wechatScore.cmbScore();
+                    return;
+                }
+
+                if (packageName.equalsIgnoreCase("com.eg.android.AlipayGphone")) {
+                    alipayScore.cmbScore();
+                    return;
                 }
 
                 break;

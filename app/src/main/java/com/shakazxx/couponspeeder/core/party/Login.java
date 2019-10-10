@@ -1,57 +1,35 @@
 package com.shakazxx.couponspeeder.core.party;
 
 import android.accessibilityservice.AccessibilityService;
-import android.content.Context;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.shakazxx.couponspeeder.core.base.BaseAction;
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
-import java.util.List;
+public class Login extends BaseAction {
 
-public class Login {
-
-    private AccessibilityService accessibilityService;
 
     public Login(AccessibilityService service) {
-        accessibilityService = service;
+        super(service);
     }
 
     public boolean process() {
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
-            return false;
-        }
-
-        List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByText("密码");
-        if (nodes.size() == 0) {
+        AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "密码");
+        if (node == null) {
             return true;
         }
 
-        AccessibilityNodeInfo input = nodes.get(0).getParent().getChild(4);
-        input.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+        AccessibilityNodeInfo input = node.getParent().getChild(4);
 
-        Bundle arguments = new Bundle();
-        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "");
-        input.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+        CommonUtil.inputText(input, "xcl880809");
 
-        nodes = root.findAccessibilityNodeInfosByText("登录");
-        if (nodes.size() > 0) {
-            AccessibilityNodeInfo btn = nodes.get(0);
-            if (btn.isClickable()) {
-                CommonUtil.click(btn, 3000);
+        AccessibilityNodeInfo btn = CommonUtil.findFirstNodeByText(accessibilityService, null, "登录");
 
-                WindowManager wm = (WindowManager) accessibilityService.getSystemService(Context.WINDOW_SERVICE);
-                DisplayMetrics dm = new DisplayMetrics();
-                wm.getDefaultDisplay().getMetrics(dm);
-
-                GestureUtil.click(accessibilityService, dm.widthPixels - 20, dm.heightPixels - 20, 1000);
-
-                return true;
-            }
+        if (CommonUtil.click(btn, 3000)) {
+            GestureUtil.click(accessibilityService, getWidth() - 20, getHeight() - 20, 1000);
+            showToast("登录成功");
+            return true;
         }
 
         return false;

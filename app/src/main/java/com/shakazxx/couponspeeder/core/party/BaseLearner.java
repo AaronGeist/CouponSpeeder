@@ -5,27 +5,25 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.shakazxx.couponspeeder.core.base.BaseAction;
+import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK;
 import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
-public abstract class BaseLearner {
+public abstract class BaseLearner extends BaseAction {
 
     protected final String TAG = getClass().getSimpleName();
 
     // local variables
     private boolean enable = true;
 
-    // service
-    protected AccessibilityService accessibilityService;
-
     // constructor
     public BaseLearner(AccessibilityService service) {
-        accessibilityService = service;
+        super(service);
     }
 
     public boolean findEntrance(String keyword) {
@@ -34,17 +32,13 @@ public abstract class BaseLearner {
         }
 
         boolean result = false;
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
-            return false;
-        }
-
-        List<AccessibilityNodeInfo> entrances = root.findAccessibilityNodeInfosByText(keyword);
+        List<AccessibilityNodeInfo> entrances = CommonUtil.findAllByText(accessibilityService, null, keyword);
         for (AccessibilityNodeInfo entrance : entrances) {
             if ((entrance.getClassName().toString().contains("TextView") && entrance.getText().toString().equalsIgnoreCase(keyword)) ||
                     (entrance.getClassName().toString().contains("FrameLayout") && entrance.getContentDescription() != null
                             && entrance.getContentDescription().toString().equalsIgnoreCase(keyword))) {
 
+                result = CommonUtil.click(entrance, 1000);
                 // 往上找，找到可以点击的
                 while (entrance != null && !entrance.isClickable()) {
                     entrance = entrance.getParent();
@@ -64,62 +58,51 @@ public abstract class BaseLearner {
         return result;
     }
 
-    // return true if has finished loop entries
-    public void loop(String keyword, String innerKeyword) {
+    // return true if has finished processSingle entries
+    public void processSingle(String keyword) {
         if (!enable) {
             return;
         }
 
-        int totalCnt = 0;
+        int currentCnt = 0;
         List<String> readTitles = new ArrayList<>();
-        while (totalCnt < getRequiredEntryCnt()) {
-            AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-            List<AccessibilityNodeInfo> entries = root.findAccessibilityNodeInfosByText(keyword);
-            if (entries.size() > 0) {
-                for (AccessibilityNodeInfo entry : entries) {
+        while (currentCnt < getRequiredEntryCnt()) {
+            List<AccessibilityNodeInfo> entries = CommonUtil.findAllByText(accessibilityService, null, keyword);
+            for (AccessibilityNodeInfo entry : entries) {
 
-                    try {
-                        // 屏幕外的部分不要
-                        Rect rect = new Rect();
-                        entry.getBoundsInScreen(rect);
-                        if (rect.left < 0 || rect.right < 0) {
-                            continue;
-                        }
+                try {
+                    // 屏幕外的部分不要
+                    Rect rect = new Rect();
+                    entry.getBoundsInScreen(rect);
+                    if (rect.left < 0 || rect.right < 0) {
+                        continue;
+                    }
 
-                        AccessibilityNodeInfo btn = entry.getParent();
-                        String title = btn.getChild(0).getText().toString();
-                        if (!readTitles.contains(title)) {
-                            // 发现不重复项
-                            Log.d(TAG, "当前标题: " + title);
-                            readTitles.add(title);
-                            sleep(1000);
-                            if (btn.isClickable()) {
-                                btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    AccessibilityNodeInfo btn = entry.getParent();
+                    String title = btn.getChild(0).getText().toString();
+                    if (!readTitles.contains(title)) {
+                        // 发现不重复项
+                        showToast("当前标题: " + title);
+                        readTitles.add(title);
+                        if (CommonUtil.click(btn, 1000)) {
+                            Log.d(TAG, "进入单项");
+                            if (processEntry(title)) {
+                                currentCnt++;
+                            }
+                            CommonUtil.globalBack(accessibilityService, 1000);
 
-                                AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
-                                List<AccessibilityNodeInfo> inners = newRoot.findAccessibilityNodeInfosByText(innerKeyword);
-                                if (inners.size() > 0) {
-                                    Log.d(TAG, "进入单项");
-                                    if (processEntry(title)) {
-                                        totalCnt++;
-                                    }
-                                    accessibilityService.performGlobalAction(GLOBAL_ACTION_BACK);
-                                    sleep(1000);
-
-                                    if (totalCnt >= getRequiredEntryCnt()) {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                Log.e(TAG, "无法点击进入: " + title);
+                            if (currentCnt >= getRequiredEntryCnt()) {
+                                break;
                             }
                         }
-                    } catch (Exception e) {
+                    } else {
+                        showToast("无法点击进入: " + title);
                     }
+                } catch (Exception e) {
                 }
             }
 
-            if (totalCnt < getRequiredEntryCnt()) {
+            if (currentCnt < getRequiredEntryCnt()) {
                 GestureUtil.scrollDown(accessibilityService, 500);
                 sleep(3000);
             }

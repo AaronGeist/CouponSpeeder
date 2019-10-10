@@ -1,6 +1,13 @@
 package com.shakazxx.couponspeeder.core.util;
 
+import android.accessibilityservice.AccessibilityService;
+import android.os.Bundle;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK;
 
 public class CommonUtil {
 
@@ -10,6 +17,44 @@ public class CommonUtil {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<AccessibilityNodeInfo> findAllByViewId(AccessibilityService service, AccessibilityNodeInfo root, String viewId) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+        if (root == null) {
+            return new ArrayList<>();
+        }
+
+        return root.findAccessibilityNodeInfosByViewId(viewId);
+    }
+
+    public static List<AccessibilityNodeInfo> findAllByText(AccessibilityService service, AccessibilityNodeInfo root, String text) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+        if (root == null) {
+            return new ArrayList<>();
+        }
+
+        return root.findAccessibilityNodeInfosByText(text);
+    }
+
+    public static AccessibilityNodeInfo findFirstByViewId(AccessibilityService service, AccessibilityNodeInfo root, String viewId) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+        if (root == null) {
+            return null;
+        }
+
+        List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByViewId(viewId);
+        if (nodes.size() == 0) {
+            return null;
+        }
+
+        return nodes.get(0);
     }
 
     public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityNodeInfo root, String nodeClassName) {
@@ -31,8 +76,23 @@ public class CommonUtil {
         return null;
     }
 
+    public static void inputText(AccessibilityNodeInfo inputNode, String text) {
+        if (inputNode == null) {
+            return;
+        }
 
-    public static AccessibilityNodeInfo findFirstNodeByText(AccessibilityNodeInfo root, String text) {
+        inputNode.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+
+        Bundle arguments = new Bundle();
+        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
+        inputNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+    }
+
+    public static AccessibilityNodeInfo findFirstNodeByText(AccessibilityService service, AccessibilityNodeInfo root, String text) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+
         if (root == null) {
             return null;
         }
@@ -43,7 +103,12 @@ public class CommonUtil {
 
         int maxIndex = root.getChildCount();
         for (int i = 0; i < maxIndex; i++) {
-            AccessibilityNodeInfo node = findFirstNodeByText(root.getChild(i), text);
+            AccessibilityNodeInfo child = root.getChild(i);
+            if (child == null) {
+                continue;
+            }
+
+            AccessibilityNodeInfo node = findFirstNodeByText(service, child, text);
             if (node != null) {
                 return node;
             }
@@ -64,5 +129,10 @@ public class CommonUtil {
         } else {
             return click(node.getParent(), delayTime);
         }
+    }
+
+    public static void globalBack(AccessibilityService service, int delayTime) {
+        service.performGlobalAction(GLOBAL_ACTION_BACK);
+        sleep(delayTime);
     }
 }

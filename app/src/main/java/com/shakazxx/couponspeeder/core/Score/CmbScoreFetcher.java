@@ -6,8 +6,6 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
-import java.util.List;
-
 public class CmbScoreFetcher extends BaseScoreFetcher {
 
     public CmbScoreFetcher(AccessibilityService service) {
@@ -19,53 +17,35 @@ public class CmbScoreFetcher extends BaseScoreFetcher {
             return false;
         }
 
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
+        if (!CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "我的"), 2000)) {
             return false;
         }
 
-        List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByText("我的积分按钮");
-        if (nodes.size() > 0) {
-            CommonUtil.click(nodes.get(0), 2000);
+        if (!loginIfNeeded()) {
+            // 登录失败
+            return false;
+        }
 
-            if (!loginIfNeeded()) {
-                // 登录失败
-                return false;
-            }
+        if (!CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "积分"), 3000)) {
+            return false;
+        }
 
-            root = accessibilityService.getRootInActiveWindow();
-            if (root == null) {
-                return false;
-            }
+        if (!CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "签到"), 8000)) {
+            return false;
+        }
 
-            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(root, "签到");
-            if (!CommonUtil.click(node, 8000)) {
-                return false;
-            }
-
-            root = accessibilityService.getRootInActiveWindow();
-            if (root == null) {
-                return false;
-            }
-
-            node = CommonUtil.findFirstNodeByText(root, "签到领积分");
-            if (CommonUtil.click(node, 0)) {
-                accessibilityService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
-                enable = false;
-                return true;
-            }
+        if (CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "签到领积分"), 0)
+                || (CommonUtil.findFirstNodeByText(accessibilityService, null, "今日已签到") != null)) {
+            accessibilityService.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+            enable = false;
+            return true;
         }
 
         return false;
     }
 
     protected boolean loginIfNeeded() {
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
-            return false;
-        }
-
-        AccessibilityNodeInfo btn = CommonUtil.findFirstNodeByText(root, "登录");
+        AccessibilityNodeInfo btn = CommonUtil.findFirstNodeByText(accessibilityService, null, "登录");
         if (btn == null) {
             return true;
         }

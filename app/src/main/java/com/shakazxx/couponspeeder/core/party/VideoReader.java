@@ -6,15 +6,12 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.List;
-import java.util.Random;
 
 import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class VideoReader extends BaseLearner {
 
     private int videoReadTimeInSecondsLeft = 180 * getRequiredEntryCnt();  //视频观看秒数
-
-    private Random r = new Random();
 
     public VideoReader(AccessibilityService service) {
         super(service);
@@ -74,7 +71,7 @@ public class VideoReader extends BaseLearner {
 
     @Override
     int getRequiredEntryCnt() {
-        return 6;
+        return 7;
     }
 
 }

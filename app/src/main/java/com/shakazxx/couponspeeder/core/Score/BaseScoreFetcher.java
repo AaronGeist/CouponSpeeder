@@ -3,19 +3,18 @@ package com.shakazxx.couponspeeder.core.Score;
 import android.accessibilityservice.AccessibilityService;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.shakazxx.couponspeeder.core.base.BaseAction;
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
 
 import java.util.List;
 
-public abstract class BaseScoreFetcher {
+public abstract class BaseScoreFetcher extends BaseAction {
 
 
     protected boolean enable = true;
 
-    protected AccessibilityService accessibilityService;
-
     public BaseScoreFetcher(AccessibilityService service) {
-        accessibilityService = service;
+        super(service);
     }
 
     public boolean fetch(String entryText) {
@@ -37,22 +36,12 @@ public abstract class BaseScoreFetcher {
                 return false;
             }
 
-            root = accessibilityService.getRootInActiveWindow();
-            if (root == null) {
-                return false;
-            }
-
-            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(root, "签到");
+            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "签到");
             if (!CommonUtil.click(node, 2000)) {
                 return false;
             }
 
-            root = accessibilityService.getRootInActiveWindow();
-            if (root == null) {
-                return false;
-            }
-
-            node = CommonUtil.findFirstNodeByText(root, "签到领积分");
+            node = CommonUtil.findFirstNodeByText(accessibilityService, null, "签到领积分");
             if (CommonUtil.click(node, 0)) {
                 enable = false;
                 return true;
