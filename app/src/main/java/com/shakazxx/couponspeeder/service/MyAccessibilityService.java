@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -24,6 +25,8 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private static final String TAG = MyAccessibilityService.class.getSimpleName();
 
+    private Bundle bundle;
+
     private PartyStudent partyStudent;
     private CmbScoreFetcher cmbScoreFetcher;
     private SpdccScoreFetcher spdccScoreFetcher;
@@ -31,16 +34,11 @@ public class MyAccessibilityService extends AccessibilityService {
     private AlipayScore alipayScore;
 
     @Override
-
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
 
-        partyStudent = new PartyStudent(this);
-        cmbScoreFetcher = new CmbScoreFetcher(this);
-        spdccScoreFetcher = new SpdccScoreFetcher(this);
-        wechatScore = new WechatScore(this);
-        alipayScore = new AlipayScore(this);
+
 
         lightScreen();
     }
@@ -50,6 +48,14 @@ public class MyAccessibilityService extends AccessibilityService {
         if (null == intent) {
             return super.onStartCommand(intent, flags, startId);
         }
+
+        this.bundle = intent.getExtras();
+
+        partyStudent = new PartyStudent(this, bundle);
+        cmbScoreFetcher = new CmbScoreFetcher(this);
+        spdccScoreFetcher = new SpdccScoreFetcher(this);
+        wechatScore = new WechatScore(this);
+        alipayScore = new AlipayScore(this);
 
         return super.onStartCommand(intent, flags, startId);
     }

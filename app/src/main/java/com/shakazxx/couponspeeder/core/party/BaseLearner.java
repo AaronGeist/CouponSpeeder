@@ -2,6 +2,7 @@ package com.shakazxx.couponspeeder.core.party;
 
 import android.accessibilityservice.AccessibilityService;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -22,7 +23,9 @@ public abstract class BaseLearner extends BaseAction {
     private int maxScrollDownCnt = 100;
 
     // local variables
-    private boolean enable = true;
+    protected boolean enable = true;
+
+    protected Bundle bundle;
 
     // application is not running, then pending
     protected boolean pending = false;
@@ -30,8 +33,9 @@ public abstract class BaseLearner extends BaseAction {
     protected HistoryRecord historyRecord = new HistoryRecord();
 
     // constructor
-    public BaseLearner(AccessibilityService service) {
+    public BaseLearner(AccessibilityService service, Bundle bundle) {
         super(service);
+        this.bundle = bundle;
     }
 
     public boolean findEntrance(String keyword) {
@@ -120,7 +124,7 @@ public abstract class BaseLearner extends BaseAction {
             if (currentCnt < getRequiredEntryCnt()) {
                 GestureUtil.scrollDown(accessibilityService, 500);
                 currScrollCnt++;
-                sleep(2000);
+                sleep(800);
             }
         }
 

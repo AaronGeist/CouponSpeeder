@@ -2,6 +2,7 @@ package com.shakazxx.couponspeeder.core.party;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,18 +12,21 @@ public class PartyStudent {
 
     private ArticleReader articleReader;
     private VideoReader videoReader;
+    private LocalChannel localChannel;
     private Login login;
 
-    public PartyStudent(AccessibilityService service) {
+    public PartyStudent(AccessibilityService service, Bundle bundle) {
         login = new Login(service);
-        articleReader = new ArticleReader(service);
-        videoReader = new VideoReader(service);
+        articleReader = new ArticleReader(service, bundle);
+        videoReader = new VideoReader(service, bundle);
+        localChannel = new LocalChannel(service, bundle);
     }
 
     public void learn() {
         login();
         readArticle();
         watchVideo();
+        localChannel();
     }
 
     public void stop() {
@@ -51,6 +55,14 @@ public class PartyStudent {
         if (videoReader.findEntrance("电视台")) {
             if (videoReader.findEntrance("联播频道")) {
                 videoReader.processSingle(date);
+            }
+        }
+    }
+
+    private void localChannel() {
+        if (localChannel.findEntrance("学习")) {
+            if (localChannel.findEntrance("上海")) {
+                localChannel.processSingle("");
             }
         }
     }

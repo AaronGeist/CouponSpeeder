@@ -10,17 +10,23 @@ import java.util.List;
 public class GestureUtil {
 
     public static void scrollDown(AccessibilityService service, int distance) {
+        scrollDown(service, 360, 1200, distance);
+    }
+
+    public static void scrollDown(AccessibilityService service, int startX, int startY, int distance) {
         GestureDescription.Builder builder = new GestureDescription.Builder();
 
         Path path = new Path();
-        int y = 1200;
-        int x = 360;
 
-        path.moveTo(x, y);
-        path.lineTo(x, y -= distance);
+        int endY = startY - distance;
+        if (endY < 0) {
+            endY = 0;
+        }
+        path.moveTo(startX, startY);
+        path.lineTo(startX, endY);
 
         GestureDescription gestureDescription = builder
-                .addStroke(new GestureDescription.StrokeDescription(path, 200L, 800L, false))
+                .addStroke(new GestureDescription.StrokeDescription(path, 100L, 800L, false))
                 .build();
 
         service.dispatchGesture(gestureDescription, null, null);
@@ -46,8 +52,12 @@ public class GestureUtil {
 
         Path path = new Path();
 
+        int endX = x - distance;
+        if (endX < 0) {
+            endX = 0;
+        }
         path.moveTo(x, y);
-        path.lineTo(x -= distance, y);
+        path.lineTo(endX, y);
 
         GestureDescription gestureDescription = builder
                 .addStroke(new GestureDescription.StrokeDescription(path, 20L, 800L, false))

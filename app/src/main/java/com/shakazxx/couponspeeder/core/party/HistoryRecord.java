@@ -1,73 +1,49 @@
 package com.shakazxx.couponspeeder.core.party;
 
-import android.os.Environment;
-import android.util.Log;
+import com.shakazxx.couponspeeder.core.util.FileUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class HistoryRecord {
 
-    private static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/partyStudyRecords.txt";
+    private static final String FILE_PATH = FileUtil.getRootPath() + "/Download/partyStudyRecords.txt";
 
     private static final String DELIMITER = "\n";
 
-    public void writeData(String data) {
-        FileWriter writer = null;
-        try {
-            File file = new File(FILE_PATH);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
 
-            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
-            writer = new FileWriter(FILE_PATH, true);
-            writer.write(data + DELIMITER);
-        } catch (IOException e) {
-            Log.d(this.getClass().getSimpleName(), e.getMessage());
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                Log.d(this.getClass().getSimpleName(), e.getMessage());
-            }
+    public static void writeData(String data) {
+        FileUtil.writeLine(FILE_PATH, data, true);
+    }
+
+    public static List<String> readData() {
+        String data = FileUtil.readAll(FILE_PATH);
+        if (data != null) {
+            return Arrays.asList(data.split(DELIMITER));
+        } else {
+            return new ArrayList<>();
         }
     }
 
-    public List<String> readData() {
-        FileReader r = null;
-        BufferedReader br = null;
-        StringBuffer msg = new StringBuffer();
-        try {
-            File file = new File(FILE_PATH);
-            r = new FileReader(file);
-            br = new BufferedReader(r);
-            //由于每次只能读一行，就让其不断地读
-
-            String s;
-            while ((s = br.readLine()) != null) {
-                msg = msg.append(s).append(DELIMITER); //必须要加\n 否则全部数据变成一行
-            }
-        } catch (Exception e) {
-            Log.d(this.getClass().getSimpleName(), e.getMessage());
-        } finally {
-            try {
-                if (r != null) {
-                    r.close();
-                    br.close();
-                }
-            } catch (IOException e) {
-            }
+    public static void cleanup(int keepNum) {
+        String data = FileUtil.readAll(FILE_PATH);
+        if (data == null) {
+            return;
         }
 
-        Log.d("History", msg.toString());
-        return Arrays.asList(msg.toString().split(DELIMITER));
+        List<String> records = Arrays.asList(data.split(DELIMITER));
+        int size = records.size();
+
+        if (keepNum >= size) {
+            return;
+        }
+
+        List<String> newRecords = records.subList(size - keepNum - 1, size - 1);
+        StringBuilder sb = new StringBuilder();
+        for (String record : newRecords) {
+            sb.append(record).append("\n");
+        }
+        FileUtil.writeLine(FILE_PATH, sb.toString(), false);
     }
 }

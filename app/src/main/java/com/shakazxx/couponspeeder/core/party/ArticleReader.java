@@ -1,6 +1,7 @@
 package com.shakazxx.couponspeeder.core.party;
 
 import android.accessibilityservice.AccessibilityService;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -13,14 +14,29 @@ import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class ArticleReader extends BaseLearner {
 
-    private static final int REQUIRED_TIME_IN_SECOND = 130;  //等待时间  130
-    private static final int REQUIRED_SHARE_CNT = 4; //分享次数
-    private static final int MAX_SCROLL_DOWN_CNT = 15; // 下滑最大次数
+    private final String TAG = getClass().getSimpleName();
 
+    public static final int DEFAULT_TIME_IN_SECOND = 130;  //等待时间  130
+    public static final int DEFAULT_READ_ARTICLE_NUM = 8;
+    public static final int REQUIRED_SHARE_CNT = 4; //分享次数
+    public static final int MAX_SCROLL_DOWN_CNT = 30; // 下滑最大次数
+
+    private int articleNum;
+    private int articleTime;
     private int shareCnt = 0;
 
-    public ArticleReader(AccessibilityService service) {
-        super(service);
+    public ArticleReader(AccessibilityService service, Bundle bundle) {
+        super(service, bundle);
+
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+
+        articleNum = bundle.getInt("article_num", DEFAULT_READ_ARTICLE_NUM);
+        articleTime = bundle.getInt("article_time", DEFAULT_TIME_IN_SECOND);
+
+        Log.d(TAG, "article_num: " + articleNum);
+        Log.d(TAG, "article_time: " + articleTime);
     }
 
     @Override
@@ -35,13 +51,13 @@ public class ArticleReader extends BaseLearner {
         while (!pending) {
             endTime = System.currentTimeMillis();
             // 累计时间到了，不看了
-            if (endTime - startTime > REQUIRED_TIME_IN_SECOND * 1000) {
+            if (endTime - startTime > articleTime * 1000) {
                 Log.d(TAG, "阅读时间满足条件");
                 break;
             }
 
             if (!bottom) {
-                GestureUtil.scrollDown(accessibilityService, r.nextInt(200) + 800);
+                GestureUtil.scrollDown(accessibilityService, 500, 1500, r.nextInt(200) + 1000);
                 scrollDownCnt++;
                 Log.d(TAG, "下滑+1");
 
@@ -55,18 +71,14 @@ public class ArticleReader extends BaseLearner {
 
             Log.d(TAG, "等待时间：" + (endTime - startTime) / 1000);
 
-            sleep(1000);
+            sleep(r.nextInt(200) + 500);
         }
 
         return true;
     }
 
     private void preProcessHook() {
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
-            return;
-        }
-        List<AccessibilityNodeInfo> elements = root.findAccessibilityNodeInfosByText("欢迎发表你的观点");
+        List<AccessibilityNodeInfo> elements = CommonUtil.findAllByText(accessibilityService, null, "欢迎发表你的观点");
         if (elements.size() > 0) {
             // 收藏
             GestureUtil.click(accessibilityService, getWidth() - 300, getHeight() - 50, 1000);
@@ -90,6 +102,6 @@ public class ArticleReader extends BaseLearner {
 
     @Override
     int getRequiredEntryCnt() {
-        return 10;
+        return articleNum;
     }
 }

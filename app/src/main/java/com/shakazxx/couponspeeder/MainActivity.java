@@ -5,32 +5,48 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.shakazxx.couponspeeder.core.party.ArticleReader;
+import com.shakazxx.couponspeeder.core.party.HistoryRecord;
+import com.shakazxx.couponspeeder.core.party.VideoReader;
+import com.shakazxx.couponspeeder.core.util.FileUtil;
 import com.shakazxx.couponspeeder.service.MyAccessibilityService;
+
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, TimePicker.OnTimeChangedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private boolean isSet = false;
-    private Button btnStart;
-    private Button btnSettings;
+    private static final String CONFIG_FILE_PATH = FileUtil.getRootPath() + "/Download/partyStudy.cfg";
 
+    private boolean isSet = false;
+    private Button btnSave;
+    private Button btnStartPartyStudy;
+    private Button btnSettings;
+    private Button btnReset;
+    private Button btnClean;
+
+
+    private TextView tvArticleNum;
+    private TextView tvArticleTime;
+    private TextView tvVideoNum;
+    private TextView tvVideoTime;
+    private TextView tvKeepTitleNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        initBtn();
-        startService();
 
         int REQUEST_EXTERNAL_STORAGE = 1;
         String[] PERMISSIONS_STORAGE = {
@@ -39,18 +55,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         if (PackageManager.PERMISSION_GRANTED !=
-                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CONTACTS)) {
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
 
+        while (PackageManager.PERMISSION_GRANTED !=
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        initBtn();
+        initCfg();
+        startService();
     }
 
     private void initBtn() {
         btnSettings = findViewById(R.id.setting_btn);
-        btnStart = findViewById(R.id.start_btn);
+        btnSave = findViewById(R.id.saveBtn);
+        btnStartPartyStudy = findViewById(R.id.start_party_btn);
+        btnReset = findViewById(R.id.reset_btn);
+        btnClean = findViewById(R.id.clean_btn);
+
+        tvArticleNum = findViewById(R.id.article_num_tv);
+        tvArticleTime = findViewById(R.id.article_time_tv);
+        tvVideoNum = findViewById(R.id.video_num_tv);
+        tvVideoTime = findViewById(R.id.video_time_tv);
+        tvKeepTitleNum = findViewById(R.id.keep_title_tv);
 
         btnSettings.setOnClickListener(this);
-        btnStart.setOnClickListener(this);
+        btnSave.setOnClickListener(this);
+        btnStartPartyStudy.setOnClickListener(this);
+        btnReset.setOnClickListener(this);
+        btnClean.setOnClickListener(this);
+    }
+
+    private void initCfg() {
+        try {
+            String json = FileUtil.readAll(CONFIG_FILE_PATH);
+            JSONObject jsonObject = new JSONObject(json);
+            tvArticleNum.setText(jsonObject.getString("article_num"));
+            tvArticleTime.setText(jsonObject.getString("article_time"));
+            tvVideoNum.setText(jsonObject.getString("video_num"));
+            tvVideoTime.setText(jsonObject.getString("video_time"));
+
+            tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     @Override
@@ -60,11 +115,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent mIntent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 this.startActivity(mIntent);
                 break;
-            case R.id.start_btn:
+            case R.id.start_party_btn:
                 Intent intent = new Intent();
-                intent.setPackage("com.eg.android.AlipayGphone");
-                intent.setClassName("com.eg.android.AlipayGphone", "com.eg.android.AlipayGphone.AlipayLogin");
+                intent.setPackage("cn.xuexi.android");
+                intent.setClassName("cn.xuexi.android", "com.alibaba.android.rimet.biz.SplashActivity");
                 this.startActivity(intent);
+                break;
+            case R.id.saveBtn:
+                Intent nIntent = new Intent(this, MyAccessibilityService.class);
+                nIntent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
+                nIntent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
+                nIntent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
+                nIntent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
+                    jsonObject.put("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
+                    jsonObject.put("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
+                    jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+                    FileUtil.writeLine(CONFIG_FILE_PATH, jsonObject.toString(), false);
+                } catch (Exception e) {
+
+                }
+
+                startService(nIntent);
+
+                break;
+            case R.id.reset_btn:
+                tvArticleNum.setText(String.valueOf(ArticleReader.DEFAULT_READ_ARTICLE_NUM));
+                tvArticleTime.setText(String.valueOf(ArticleReader.DEFAULT_TIME_IN_SECOND));
+                tvVideoNum.setText(String.valueOf(VideoReader.DEFAULT_WATCH_CNT));
+                tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_TIME));
+
+                break;
+            case R.id.clean_btn:
+                if (tvKeepTitleNum.getText() != null && !tvKeepTitleNum.getText().toString().equals("")) {
+                    HistoryRecord.cleanup(Integer.valueOf(tvKeepTitleNum.getText().toString()));
+                }
                 break;
             default:
                 break;
@@ -72,8 +160,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startService() {
-        Intent mIntent = new Intent(this, MyAccessibilityService.class);
-        startService(mIntent);
+        Intent intent = new Intent(this, MyAccessibilityService.class);
+        intent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
+        intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
+        intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
+        intent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+
+        startService(intent);
     }
 
     @Override
