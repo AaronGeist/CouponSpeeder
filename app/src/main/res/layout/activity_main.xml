@@ -124,7 +124,7 @@
                     android:id="@+id/alipay_cmb_token"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="支付宝招行口令"
+                    android:text="招行口令"
                     tools:layout_editor_absoluteX="24dp"
                     tools:layout_editor_absoluteY="131dp" />
 
@@ -141,7 +141,7 @@
                     android:id="@+id/password"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="支付宝/微信密码"
+                    android:text="zfb/wx密码"
                     tools:layout_editor_absoluteX="24dp"
                     tools:layout_editor_absoluteY="131dp" />
 
@@ -159,8 +159,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="42dp"
                 android:gravity="right"
-                android:orientation="horizontal"
-                android:paddingLeft="160dp">
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/saveBtn"
@@ -175,7 +174,7 @@
 
                 <Button
                     android:id="@+id/reset_btn"
-                    android:layout_width="120dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dp"
                     android:background="#009688"

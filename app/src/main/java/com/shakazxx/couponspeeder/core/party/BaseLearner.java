@@ -20,7 +20,10 @@ public abstract class BaseLearner extends BaseAction {
     protected final String TAG = getClass().getSimpleName();
 
     // do not scroll down forever, if no item found, return
-    private int maxScrollDownCnt = 100;
+    private static final int MAX_SCROLL_DOWN_CNT = 100;
+
+    // 预期每种类型增加的分数
+    public static final int EXPECT_SCORE_INCR = 12;
 
     // local variables
     protected boolean enable = true;
@@ -31,6 +34,9 @@ public abstract class BaseLearner extends BaseAction {
     protected boolean pending = false;
 
     protected HistoryRecord historyRecord = new HistoryRecord();
+
+    // 最初的分数
+    private int initScore = -1;
 
     // constructor
     public BaseLearner(AccessibilityService service, Bundle bundle) {
@@ -81,7 +87,7 @@ public abstract class BaseLearner extends BaseAction {
         int currentCnt = 0;
         int currScrollCnt = 0;
         List<String> readTitles = new ArrayList<>();
-        while (currentCnt < getRequiredEntryCnt() && currScrollCnt < maxScrollDownCnt && !pending) {
+        while (currentCnt < getRequiredEntryCnt() && currScrollCnt < MAX_SCROLL_DOWN_CNT && !pending) {
             List<AccessibilityNodeInfo> entries = CommonUtil.findAllByText(accessibilityService, null, keyword);
             for (AccessibilityNodeInfo entry : entries) {
 
@@ -112,6 +118,16 @@ public abstract class BaseLearner extends BaseAction {
                             }
                             CommonUtil.globalBack(accessibilityService, 1000);
 
+                            int currentScore = getScore();
+                            if (initScore == -1) {
+                                initScore = currentScore;
+                            }
+
+                            // 分数增长达到目标，可以提前结束
+                            if (currentScore - initScore >= EXPECT_SCORE_INCR) {
+                                break;
+                            }
+
                             if (currentCnt >= getRequiredEntryCnt()) {
                                 break;
                             }
@@ -130,6 +146,20 @@ public abstract class BaseLearner extends BaseAction {
 
         //学习结束
         enable = false;
+    }
+
+    private int getScore() {
+        AccessibilityNodeInfo nodeInfo = CommonUtil.findFirstNodeByText(accessibilityService, null, "积分");
+        if (nodeInfo == null) {
+            return -1;
+        }
+
+        if (nodeInfo.getParent() != null && nodeInfo.getParent().getChildCount() >= 2) {
+            nodeInfo = nodeInfo.getParent().getChild(1);
+            return Integer.valueOf(nodeInfo.getText().toString());
+        } else {
+            return -1;
+        }
     }
 
     public void stop() {

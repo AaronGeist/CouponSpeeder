@@ -19,11 +19,13 @@ public class ArticleReader extends BaseLearner {
     public static final int DEFAULT_TIME_IN_SECOND = 130;  //等待时间  130
     public static final int DEFAULT_READ_ARTICLE_NUM = 8;
     public static final int REQUIRED_SHARE_CNT = 4; //分享次数
+    public static final int REQUIRED_COMMENT_CNT = 2; // 评论次数
     public static final int MAX_SCROLL_DOWN_CNT = 30; // 下滑最大次数
 
     private int articleNum;
     private int articleTime;
     private int shareCnt = 0;
+    private int commentCnt = 0;
 
     public ArticleReader(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
@@ -96,6 +98,16 @@ public class ArticleReader extends BaseLearner {
                 if (newElems.size() > 0) {
                     CommonUtil.click(newElems.get(0), 1000);
                     CommonUtil.globalBack(accessibilityService, 2000);
+                }
+            }
+
+            if (commentCnt < REQUIRED_COMMENT_CNT) {
+                commentCnt++;
+                GestureUtil.click(accessibilityService, 200, getHeight() - 30, 1000);
+                AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "好观点将会被优先展示");
+                if (node != null) {
+                    CommonUtil.inputText(node, CommentDict.pick());
+                    CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "发布"), 1000);
                 }
             }
         }
