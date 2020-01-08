@@ -13,7 +13,6 @@ public class PartyStudent {
     private VideoReader videoReader;
     private Login login;
 
-
     public PartyStudent(AccessibilityService service) {
         login = new Login(service);
         articleReader = new ArticleReader(service);
@@ -26,13 +25,18 @@ public class PartyStudent {
         watchVideo();
     }
 
+    public void stop() {
+        articleReader.stop();
+        videoReader.stop();
+    }
+
     private void login() {
         login.process();
     }
 
     private void readArticle() {
         @SuppressLint("SimpleDateFormat")
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String date = new SimpleDateFormat("yyyy").format(new Date());
         if (articleReader.findEntrance("学习")) {
             if (articleReader.findEntrance("推荐")) {
                 articleReader.processSingle(date);
@@ -42,10 +46,9 @@ public class PartyStudent {
 
     private void watchVideo() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
         @SuppressLint("SimpleDateFormat")
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
-        if (videoReader.findEntrance("视听学习")) {
+        String date = new SimpleDateFormat("yyyy").format(calendar.getTime());
+        if (videoReader.findEntrance("电视台")) {
             if (videoReader.findEntrance("联播频道")) {
                 videoReader.processSingle(date);
             }

@@ -2,6 +2,7 @@ package com.shakazxx.couponspeeder.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
@@ -14,7 +15,10 @@ import com.shakazxx.couponspeeder.core.alipay.AlipayScore;
 import com.shakazxx.couponspeeder.core.party.PartyStudent;
 import com.shakazxx.couponspeeder.core.wechat.WechatScore;
 
+import java.util.List;
+
 import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
+import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
 
 public class MyAccessibilityService extends AccessibilityService {
 
@@ -76,6 +80,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
         switch (eventType) {
             case TYPE_WINDOW_CONTENT_CHANGED:
+            case TYPE_WINDOW_STATE_CHANGED:
                 if (packageName.equalsIgnoreCase("cn.xuexi.android")) {
                     partyStudent.learn();
                     return;
@@ -102,6 +107,8 @@ public class MyAccessibilityService extends AccessibilityService {
                     return;
                 }
 
+                partyStudent.stop();
+
                 break;
             default:
                 break;
@@ -116,6 +123,25 @@ public class MyAccessibilityService extends AccessibilityService {
                 (PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
         mWakeLock.acquire(10 * 1000);
     }
+
+    private boolean isFront(String packageName) {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.processName.equals(packageName)) {
+                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+                    Log.i("后台", appProcess.processName);
+                    return false;
+                } else {
+                    Log.i("前台", appProcess.processName);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public void onInterrupt() {

@@ -41,6 +41,31 @@ public class CommonUtil {
         return root.findAccessibilityNodeInfosByText(text);
     }
 
+    public static AccessibilityNodeInfo findFirstByViewId(AccessibilityService service, AccessibilityNodeInfo root, String viewId, long timeout, long checkInterval) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+        if (root == null) {
+            return null;
+        }
+
+        long startTime = System.currentTimeMillis();
+        long endTime = 0;
+
+        while (endTime < startTime + timeout) {
+            List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByViewId(viewId);
+            if (nodes.size() == 0) {
+                sleep(checkInterval);
+                endTime = System.currentTimeMillis();
+                continue;
+            }
+
+            return nodes.get(0);
+        }
+
+        return null;
+    }
+
     public static AccessibilityNodeInfo findFirstByViewId(AccessibilityService service, AccessibilityNodeInfo root, String viewId) {
         if (root == null) {
             root = service.getRootInActiveWindow();
@@ -57,7 +82,11 @@ public class CommonUtil {
         return nodes.get(0);
     }
 
-    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityNodeInfo root, String nodeClassName) {
+    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityService service, AccessibilityNodeInfo root, String nodeClassName) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+
         if (root == null) {
             return null;
         }
@@ -68,7 +97,7 @@ public class CommonUtil {
 
         int maxIndex = root.getChildCount();
         for (int i = 0; i < maxIndex; i++) {
-            AccessibilityNodeInfo node = findFirstNodeByClassName(root.getChild(i), nodeClassName);
+            AccessibilityNodeInfo node = findFirstNodeByClassName(service, root.getChild(i), nodeClassName);
             if (node != null)
                 return node;
         }
@@ -86,6 +115,44 @@ public class CommonUtil {
         Bundle arguments = new Bundle();
         arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
         inputNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+    }
+
+    public static AccessibilityNodeInfo findFirstNodeByText(AccessibilityService service, String text, long timeout, long checkInterval) {
+
+        long startTime = System.currentTimeMillis();
+        long endTime = 0;
+
+        while (endTime < startTime + timeout) {
+            AccessibilityNodeInfo root = service.getRootInActiveWindow();
+
+            if (root == null) {
+                sleep(checkInterval);
+                endTime = System.currentTimeMillis();
+                continue;
+            }
+
+            if (root.getText() != null && text.equalsIgnoreCase(root.getText().toString())) {
+                return root;
+            }
+
+            int maxIndex = root.getChildCount();
+            for (int i = 0; i < maxIndex; i++) {
+                AccessibilityNodeInfo child = root.getChild(i);
+                if (child == null) {
+                    continue;
+                }
+
+                AccessibilityNodeInfo node = findFirstNodeByText(service, child, text);
+                if (node != null) {
+                    return node;
+                }
+            }
+
+            sleep(checkInterval);
+            endTime = System.currentTimeMillis();
+        }
+
+        return null;
     }
 
     public static AccessibilityNodeInfo findFirstNodeByText(AccessibilityService service, AccessibilityNodeInfo root, String text) {

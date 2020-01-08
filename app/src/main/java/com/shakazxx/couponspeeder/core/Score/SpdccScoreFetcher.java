@@ -1,24 +1,39 @@
 package com.shakazxx.couponspeeder.core.Score;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.GestureDescription;
-import android.graphics.Path;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
+import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
-import java.util.List;
+import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
 public class SpdccScoreFetcher extends BaseScoreFetcher {
+
+    boolean isLogin = false;
 
     public SpdccScoreFetcher(AccessibilityService service) {
         super(service);
     }
 
     public void fetch() {
+        if (!enable) {
+            return;
+        }
+
         if (loginIfNeeded()) {
             fetch("登录");
         }
+    }
+
+    @Override
+    public boolean fetch(String text) {
+        GestureUtil.click(accessibilityService, getWidth() - 10, 300, 10000);
+        GestureUtil.click(accessibilityService, getWidth() / 2, 500, 3000);
+        CommonUtil.globalBack(accessibilityService, 1000);
+
+        enable = false;
+        return true;
     }
 
     @Override
@@ -27,32 +42,26 @@ public class SpdccScoreFetcher extends BaseScoreFetcher {
             return false;
         }
 
-        AccessibilityNodeInfo root = accessibilityService.getRootInActiveWindow();
-        if (root == null) {
-            return false;
-        }
-
-        List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByText("登录");
-        if (nodes.size() == 0) {
+        if (isLogin) {
             return true;
         }
 
-        CommonUtil.click(nodes.get(0), 2000);
+        sleep(20000);
+        GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 30, 2000);
 
+        AccessibilityNodeInfo loginBtn = CommonUtil.findFirstNodeByText(accessibilityService, null, "登录 / 注册");
+        if (loginBtn == null) {
+            isLogin = true;
+            return true;
+        }
 
-        Path path = new Path();
-        path.moveTo(250, 900);
-        path.lineTo(250, 1500);
-        final GestureDescription.StrokeDescription sd = new GestureDescription.StrokeDescription(path, 0, 5000, true);
-        Path path2 = new Path();
-        path2.moveTo(250, 1500);
-        path2.lineTo(550, 1500);
-        final GestureDescription.StrokeDescription sd2 = sd.continueStroke(path2, 0, 5000, false);
-        accessibilityService.dispatchGesture(new GestureDescription.Builder().addStroke(sd).addStroke(sd2).build(), null, null);
+        if (!CommonUtil.click(loginBtn, 5000)) {
+            return false;
+        }
 
+        GestureUtil.click(accessibilityService, 400, 1700, 10000);
 
-//        GestureUtil.drawLine(accessibilityService, paths);
-
-        return true;
+        isLogin = CommonUtil.findFirstNodeByText(accessibilityService, null, "登录 / 注册") == null;
+        return isLogin;
     }
 }

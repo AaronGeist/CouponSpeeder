@@ -18,8 +18,16 @@ public abstract class BaseLearner extends BaseAction {
 
     protected final String TAG = getClass().getSimpleName();
 
+    // do not scroll down forever, if no item found, return
+    private int maxScrollDownCnt = 100;
+
     // local variables
     private boolean enable = true;
+
+    // application is not running, then pending
+    protected boolean pending = false;
+
+    protected HistoryRecord historyRecord = new HistoryRecord();
 
     // constructor
     public BaseLearner(AccessibilityService service) {
@@ -64,9 +72,12 @@ public abstract class BaseLearner extends BaseAction {
             return;
         }
 
+        List<String> processedTitles = historyRecord.readData();
+
         int currentCnt = 0;
+        int currScrollCnt = 0;
         List<String> readTitles = new ArrayList<>();
-        while (currentCnt < getRequiredEntryCnt()) {
+        while (currentCnt < getRequiredEntryCnt() && currScrollCnt < maxScrollDownCnt && !pending) {
             List<AccessibilityNodeInfo> entries = CommonUtil.findAllByText(accessibilityService, null, keyword);
             for (AccessibilityNodeInfo entry : entries) {
 
@@ -79,14 +90,20 @@ public abstract class BaseLearner extends BaseAction {
                     }
 
                     AccessibilityNodeInfo btn = entry.getParent();
-                    String title = btn.getChild(0).getText().toString();
+                    String title = btn.getChild(0).getText().toString().trim();
+                    if (processedTitles.contains(title)) {
+                        Log.d(TAG, "已经读过/看过：" + title);
+                        continue;
+                    }
+
                     if (!readTitles.contains(title)) {
                         // 发现不重复项
-                        showToast("当前标题: " + title);
                         readTitles.add(title);
                         if (CommonUtil.click(btn, 1000)) {
                             Log.d(TAG, "进入单项");
                             if (processEntry(title)) {
+                                // 记录数据
+                                historyRecord.writeData(title);
                                 currentCnt++;
                             }
                             CommonUtil.globalBack(accessibilityService, 1000);
@@ -95,8 +112,6 @@ public abstract class BaseLearner extends BaseAction {
                                 break;
                             }
                         }
-                    } else {
-                        showToast("无法点击进入: " + title);
                     }
                 } catch (Exception e) {
                 }
@@ -104,12 +119,17 @@ public abstract class BaseLearner extends BaseAction {
 
             if (currentCnt < getRequiredEntryCnt()) {
                 GestureUtil.scrollDown(accessibilityService, 500);
-                sleep(3000);
+                currScrollCnt++;
+                sleep(2000);
             }
         }
 
         //学习结束
         enable = false;
+    }
+
+    public void stop() {
+        this.pending = true;
     }
 
     // 进入单项后如何处理

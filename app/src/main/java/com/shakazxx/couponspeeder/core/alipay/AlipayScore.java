@@ -37,8 +37,12 @@ public class AlipayScore extends BaseAction {
     }
 
     private boolean loginIfNeeded() {
+        AccessibilityNodeInfo node = CommonUtil.findFirstByViewId(accessibilityService, null, "com.ali.user.mobile.security.ui:id/userAccountImage", 5000, 1000);
 
-        AccessibilityNodeInfo node = CommonUtil.findFirstByViewId(accessibilityService, null, "com.ali.user.mobile.security.ui:id/userAccountImage");
+        // 没有登录头像，说明已经登录了
+        if (node == null) {
+            return true;
+        }
 
         if (!CommonUtil.click(node, 1000)) {
             return false;
@@ -63,7 +67,7 @@ public class AlipayScore extends BaseAction {
     }
 
     private boolean enter() {
-        AccessibilityNodeInfo tab = CommonUtil.findFirstNodeByText(accessibilityService, null, "朋友");
+        AccessibilityNodeInfo tab = CommonUtil.findFirstNodeByText(accessibilityService, "朋友", 10000, 1000);
 
         if (!CommonUtil.click(tab, 3000)) {
             return false;

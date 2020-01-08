@@ -1,14 +1,17 @@
 package com.shakazxx.couponspeeder;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.shakazxx.couponspeeder.service.MyAccessibilityService;
 
@@ -28,6 +31,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initBtn();
         startService();
+
+        int REQUEST_EXTERNAL_STORAGE = 1;
+        String[] PERMISSIONS_STORAGE = {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        if (PackageManager.PERMISSION_GRANTED !=
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CONTACTS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
+
     }
 
     private void initBtn() {
@@ -40,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: ");
         switch (view.getId()) {
             case R.id.setting_btn:
                 Intent mIntent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);

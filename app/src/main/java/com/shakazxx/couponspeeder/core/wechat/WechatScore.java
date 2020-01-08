@@ -84,11 +84,22 @@ public class WechatScore extends BaseAction {
 
 
         AccessibilityNodeInfo item = CommonUtil.findFirstNodeByText(accessibilityService, null, "领积分");
-        CommonUtil.click(item, 5000);
+        if (item == null) {
+            // title always change, let click fixed position
+            GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 10, 5000);
+        } else {
+            CommonUtil.click(item, 5000);
+        }
 
         item = CommonUtil.findFirstNodeByText(accessibilityService, null, "签到领积分");
-        if (!CommonUtil.click(item, 5000)) {
-            return false;
+        if (item == null) {
+            GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 600, 5000);
+        } else {
+            if (!CommonUtil.click(item, 5000)) {
+                // go back to home page
+                goHomePage();
+                return false;
+            }
         }
 
         GestureUtil.click(accessibilityService, 500, 300, 1000);
@@ -116,7 +127,7 @@ public class WechatScore extends BaseAction {
         boolean find = false;
         for (AccessibilityNodeInfo node : nodes) {
             if (node.getText() != null && "招行信用卡".equalsIgnoreCase(node.getText().toString())) {
-                CommonUtil.click(node, 8000);
+                CommonUtil.click(node, 10000);
                 find = true;
                 break;
             }
@@ -126,7 +137,7 @@ public class WechatScore extends BaseAction {
             return false;
         }
 
-        GestureUtil.click(accessibilityService, 500, 1600, 5000);
+        GestureUtil.click(accessibilityService, 500, 1300, 10000);
         GestureUtil.click(accessibilityService, 500, 600, 1000);
 
         enable.set(1);
