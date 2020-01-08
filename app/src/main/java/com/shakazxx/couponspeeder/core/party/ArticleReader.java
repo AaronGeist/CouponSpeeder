@@ -34,6 +34,7 @@ public class ArticleReader extends BaseLearner {
 
         articleNum = bundle.getInt("article_num", DEFAULT_READ_ARTICLE_NUM);
         articleTime = bundle.getInt("article_time", DEFAULT_TIME_IN_SECOND);
+        enable = bundle.getBoolean("enable_article", true);
 
         Log.d(TAG, "article_num: " + articleNum);
         Log.d(TAG, "article_time: " + articleTime);

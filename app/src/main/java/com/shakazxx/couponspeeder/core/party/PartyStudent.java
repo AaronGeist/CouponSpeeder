@@ -32,6 +32,7 @@ public class PartyStudent {
     public void stop() {
         articleReader.stop();
         videoReader.stop();
+        localChannel.stop();
     }
 
     private void login() {

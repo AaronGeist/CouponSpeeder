@@ -29,6 +29,7 @@ public class VideoReader extends BaseLearner {
 
         videoNum = bundle.getInt("video_num", DEFAULT_WATCH_CNT);
         videoReadTimeInSecondsLeft = bundle.getInt("video_time", DEFAULT_OVERALL_TIME);
+        enable = bundle.getBoolean("enable_video", true);
 
         Log.d(TAG, "video_num: " + videoNum);
         Log.d(TAG, "video_time: " + videoReadTimeInSecondsLeft);

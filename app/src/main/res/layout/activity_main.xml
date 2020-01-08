@@ -14,99 +14,158 @@
         tools:layout_editor_absoluteX="98dp"
         tools:layout_editor_absoluteY="61dp">
 
-        <TextView
-            android:id="@+id/article_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="文章数"
-            tools:layout_editor_absoluteX="24dp"
-            tools:layout_editor_absoluteY="131dp" />
-
-        <EditText
-            android:id="@+id/article_num_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            tools:layout_editor_absoluteX="99dp"
-            tools:layout_editor_absoluteY="114dp" />
-
-        <TextView
-            android:id="@+id/article_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="文章单篇时间"
-            tools:layout_editor_absoluteX="24dp"
-            tools:layout_editor_absoluteY="193dp" />
-
-        <EditText
-            android:id="@+id/article_time_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            tools:layout_editor_absoluteX="99dp"
-            tools:layout_editor_absoluteY="167dp" />
-
-        <TextView
-            android:id="@+id/video_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="视频数"
-            tools:layout_editor_absoluteX="24dp"
-            tools:layout_editor_absoluteY="249dp" />
-
-        <EditText
-            android:id="@+id/video_num_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            tools:layout_editor_absoluteX="99dp"
-            tools:layout_editor_absoluteY="223dp" />
-
-
-        <TextView
-            android:id="@+id/video_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="视频观看总时间"
-            tools:layout_editor_absoluteX="22dp"
-            tools:layout_editor_absoluteY="304dp" />
-
-        <EditText
-            android:id="@+id/video_time_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            tools:layout_editor_absoluteX="99dp"
-            tools:layout_editor_absoluteY="284dp" />
-
-        <Button
-            android:id="@+id/saveBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="保存"
-            tools:layout_editor_absoluteX="301dp"
-            tools:layout_editor_absoluteY="345dp" />
-
-        <Button
-            android:id="@+id/setting_btn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="权限开关"/>
-        <Button
-            android:id="@+id/start_party_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="开启学习强国"/>
+            android:background="#4DF0E23E"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <Button
-            android:id="@+id/reset_btn"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/article_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文章数"
+                    tools:layout_editor_absoluteX="24dp"
+                    tools:layout_editor_absoluteY="131dp" />
+
+                <EditText
+                    android:id="@+id/article_num_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="number"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="114dp" />
+
+                <TextView
+                    android:id="@+id/article_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文章单篇时间"
+                    tools:layout_editor_absoluteX="24dp"
+                    tools:layout_editor_absoluteY="193dp" />
+
+                <EditText
+                    android:id="@+id/article_time_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="number"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="167dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/video_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="视频数"
+                    tools:layout_editor_absoluteX="24dp"
+                    tools:layout_editor_absoluteY="249dp" />
+
+                <EditText
+                    android:id="@+id/video_num_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="number"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="223dp" />
+
+                <TextView
+                    android:id="@+id/video_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="视频观看总时间"
+                    tools:layout_editor_absoluteX="22dp"
+                    tools:layout_editor_absoluteY="304dp" />
+
+                <EditText
+                    android:id="@+id/video_time_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="number"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="284dp" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switchArticle"
+                android:layout_width="match_parent"
+                android:layout_height="11dp"
+                android:text="是否读文章"
+                tools:checked="true" />
+
+            <Switch
+                android:id="@+id/switchVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="是否看视频" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/saveBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="#FF5722"
+                    android:text="保存"
+                    android:textColor="@android:color/white"
+                    tools:layout_editor_absoluteX="301dp"
+                    tools:layout_editor_absoluteY="345dp" />
+
+                <Button
+                    android:id="@+id/reset_btn"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="#009688"
+                    android:text="恢复默认值"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="恢复默认值" />
+            android:background="#F4FF81"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/setting_btn"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:background="#80D8FF"
+                android:text="授权" />
+
+            <Button
+                android:id="@+id/start_party_btn"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:background="#B9F6CA"
+                android:text="学习强国" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView"
@@ -116,14 +175,14 @@
 
         <EditText
             android:id="@+id/keep_title_tv"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number" />
 
         <Button
             android:id="@+id/clean_btn"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:text="清理历史标题" />
 

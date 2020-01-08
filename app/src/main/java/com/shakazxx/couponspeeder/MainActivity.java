@@ -8,6 +8,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvVideoNum;
     private TextView tvVideoTime;
     private TextView tvKeepTitleNum;
+
+    private Switch swArticle;
+    private Switch swVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvVideoTime = findViewById(R.id.video_time_tv);
         tvKeepTitleNum = findViewById(R.id.keep_title_tv);
 
+        swArticle = findViewById(R.id.switchArticle);
+        swVideo = findViewById(R.id.switchVideo);
+
         btnSettings.setOnClickListener(this);
         btnSave.setOnClickListener(this);
         btnStartPartyStudy.setOnClickListener(this);
@@ -101,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tvArticleTime.setText(jsonObject.getString("article_time"));
             tvVideoNum.setText(jsonObject.getString("video_num"));
             tvVideoTime.setText(jsonObject.getString("video_time"));
+            swArticle.setChecked(jsonObject.getBoolean("enable_article"));
+            swVideo.setChecked(jsonObject.getBoolean("enable_video"));
 
             tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
         } catch (Exception e) {
@@ -126,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 nIntent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
                 nIntent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
                 nIntent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
-                nIntent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+                nIntent.putExtra("enable_article", swArticle.isChecked());
+                nIntent.putExtra("enable_video", swVideo.isChecked());
 
                 try {
                     JSONObject jsonObject = new JSONObject();
@@ -134,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
                     jsonObject.put("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
                     jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+                    jsonObject.put("enable_article", swArticle.isChecked());
+                    jsonObject.put("enable_video", swVideo.isChecked());
                     FileUtil.writeLine(CONFIG_FILE_PATH, jsonObject.toString(), false);
                 } catch (Exception e) {
 
@@ -147,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvArticleTime.setText(String.valueOf(ArticleReader.DEFAULT_TIME_IN_SECOND));
                 tvVideoNum.setText(String.valueOf(VideoReader.DEFAULT_WATCH_CNT));
                 tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_TIME));
+                swArticle.setChecked(true);
+                swVideo.setChecked(true);
 
                 break;
             case R.id.clean_btn:
@@ -165,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
         intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
         intent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+        intent.putExtra("enable_article", swArticle.isChecked());
+        intent.putExtra("enable_video", swVideo.isChecked());
 
         startService(intent);
     }
