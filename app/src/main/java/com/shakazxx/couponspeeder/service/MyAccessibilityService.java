@@ -39,7 +39,6 @@ public class MyAccessibilityService extends AccessibilityService {
         Log.d(TAG, "onCreate");
 
 
-
         lightScreen();
     }
 
@@ -54,8 +53,8 @@ public class MyAccessibilityService extends AccessibilityService {
         partyStudent = new PartyStudent(this, bundle);
         cmbScoreFetcher = new CmbScoreFetcher(this);
         spdccScoreFetcher = new SpdccScoreFetcher(this);
-        wechatScore = new WechatScore(this);
-        alipayScore = new AlipayScore(this);
+        wechatScore = new WechatScore(this, bundle);
+        alipayScore = new AlipayScore(this, bundle);
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -103,7 +102,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 }
 
                 if (packageName.equalsIgnoreCase("com.tencent.mm")) {
-                    wechatScore.pbcc();
+//                    wechatScore.pbcc();
                     wechatScore.cmbScore();
                     return;
                 }

@@ -1,6 +1,7 @@
 package com.shakazxx.couponspeeder.core.wechat;
 
 import android.accessibilityservice.AccessibilityService;
+import android.os.Bundle;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.base.BaseAction;
@@ -18,13 +19,21 @@ public class WechatScore extends BaseAction {
 
     private BitSet enable = new BitSet(2);
 
-    public WechatScore(AccessibilityService service) {
+    private String password;
+
+    public WechatScore(AccessibilityService service, Bundle bundle) {
         super(service);
+
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+
+        password = bundle.getString("password");
     }
 
     public void cmbScore() {
         // both has finished
-        if (enable.cardinality() == 2) {
+        if (enable.cardinality() == 1) {
             return;
         }
 
@@ -33,7 +42,7 @@ public class WechatScore extends BaseAction {
         }
 
         signScore();
-        programScore();
+//        programScore();
     }
 
     public void pbcc() {
@@ -45,17 +54,17 @@ public class WechatScore extends BaseAction {
     }
 
     private boolean loginIfNeeded() {
-        AccessibilityNodeInfo pwd = CommonUtil.findFirstByViewId(accessibilityService, null, "com.tencent.mm:id/ka");
+        AccessibilityNodeInfo pwd = CommonUtil.findFirstNodeByText(accessibilityService, null, "请填写微信密码");
         if (pwd == null) {
             return true;
         }
 
-        CommonUtil.inputText(pwd, "1234qwerasdf");
+        CommonUtil.inputText(pwd, password);
 
-        AccessibilityNodeInfo btn = CommonUtil.findFirstByViewId(accessibilityService, null, "com.tencent.mm:id/cmw");
-
+        // 点击登陆按钮
+        GestureUtil.click(accessibilityService, 600, 1100, 5000);
         // 多等一会儿
-        return CommonUtil.click(btn, 10000);
+        return true;
     }
 
     private boolean signScore() {
@@ -64,34 +73,22 @@ public class WechatScore extends BaseAction {
         }
 
 
-        List<AccessibilityNodeInfo> nodes = CommonUtil.findAllByViewId(accessibilityService, null, "com.tencent.mm:id/b4o");
-        if (nodes.size() == 0) {
+        if (CommonUtil.findFirstNodeByText(accessibilityService, "微信", 10000, 1000) == null) {
             return false;
         }
 
-        boolean find = false;
-        for (AccessibilityNodeInfo node : nodes) {
-            if (node.getText() != null && "招商银行信用卡".equalsIgnoreCase(node.getText().toString())) {
-                CommonUtil.click(node, 5000);
-                find = true;
-                break;
-            }
-        }
-
-        if (!find) {
-            return false;
-        }
-
+        // 招行信用卡入口
+        GestureUtil.click(accessibilityService, 600, 300, 1000);
 
         AccessibilityNodeInfo item = CommonUtil.findFirstNodeByText(accessibilityService, null, "领积分");
         if (item == null) {
             // title always change, let click fixed position
-            GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 10, 5000);
+            GestureUtil.click(accessibilityService, getWidth() - 10, getHeight() - 10, 5000);
         } else {
             CommonUtil.click(item, 5000);
         }
 
-        item = CommonUtil.findFirstNodeByText(accessibilityService, null, "签到领积分");
+        item = CommonUtil.findFirstNodeByText(accessibilityService, null, "签到有好礼");
         if (item == null) {
             GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 600, 5000);
         } else {
@@ -213,8 +210,7 @@ public class WechatScore extends BaseAction {
 
     private void goHomePage() {
         while (true) {
-            List<AccessibilityNodeInfo> nodes = CommonUtil.findAllByViewId(accessibilityService, null, "com.tencent.mm:id/d3t");
-            if (nodes.size() > 0) {
+            if (CommonUtil.findFirstNodeByText(accessibilityService, null, "通讯录") != null) {
                 return;
             }
 

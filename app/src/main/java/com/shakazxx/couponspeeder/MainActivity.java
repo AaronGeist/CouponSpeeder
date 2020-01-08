@@ -37,12 +37,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnReset;
     private Button btnClean;
 
-
     private TextView tvArticleNum;
     private TextView tvArticleTime;
     private TextView tvVideoNum;
     private TextView tvVideoTime;
     private TextView tvKeepTitleNum;
+    private TextView tvAlipayCmbToken;
+    private TextView tvPassword;
 
     private Switch swArticle;
     private Switch swVideo;
@@ -52,6 +53,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        grantPermission();
+        initBtn();
+        initCfg();
+        startService();
+    }
+
+    private void grantPermission() {
+        // 读写权限检查 & 等待
         int REQUEST_EXTERNAL_STORAGE = 1;
         String[] PERMISSIONS_STORAGE = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -71,10 +80,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
-
-        initBtn();
-        initCfg();
-        startService();
     }
 
     private void initBtn() {
@@ -89,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvVideoNum = findViewById(R.id.video_num_tv);
         tvVideoTime = findViewById(R.id.video_time_tv);
         tvKeepTitleNum = findViewById(R.id.keep_title_tv);
+        tvAlipayCmbToken = findViewById(R.id.alipay_cmb_token_tv);
+        tvPassword = findViewById(R.id.password_tv);
+
 
         swArticle = findViewById(R.id.switchArticle);
         swVideo = findViewById(R.id.switchVideo);
@@ -112,9 +120,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             swVideo.setChecked(jsonObject.getBoolean("enable_video"));
 
             tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
+            tvAlipayCmbToken.setText(jsonObject.getString("alipay_cmb_token"));
+            tvPassword.setText(jsonObject.getString("password"));
+
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
+    }
+
+    private Intent createIntent() {
+        Intent intent = new Intent(this, MyAccessibilityService.class);
+        intent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
+        intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
+        intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
+        intent.putExtra("enable_article", swArticle.isChecked());
+        intent.putExtra("enable_video", swVideo.isChecked());
+        intent.putExtra("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
+        intent.putExtra("password", tvPassword.getText().toString());
+
+        return intent;
     }
 
     @Override
@@ -125,19 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 this.startActivity(mIntent);
                 break;
             case R.id.start_party_btn:
-                Intent intent = new Intent();
-                intent.setPackage("cn.xuexi.android");
-                intent.setClassName("cn.xuexi.android", "com.alibaba.android.rimet.biz.SplashActivity");
-                this.startActivity(intent);
+                startActivity("cn.xuexi.android", "com.alibaba.android.rimet.biz.SplashActivity");
                 break;
             case R.id.saveBtn:
-                Intent nIntent = new Intent(this, MyAccessibilityService.class);
-                nIntent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
-                nIntent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
-                nIntent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
-                nIntent.putExtra("enable_article", swArticle.isChecked());
-                nIntent.putExtra("enable_video", swVideo.isChecked());
-
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
@@ -146,12 +160,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
                     jsonObject.put("enable_article", swArticle.isChecked());
                     jsonObject.put("enable_video", swVideo.isChecked());
+                    jsonObject.put("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
+                    jsonObject.put("password", tvPassword.getText().toString());
+
+
                     FileUtil.writeLine(CONFIG_FILE_PATH, jsonObject.toString(), false);
                 } catch (Exception e) {
 
                 }
 
-                startService(nIntent);
+                startService(createIntent());
 
                 break;
             case R.id.reset_btn:
@@ -161,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_TIME));
                 swArticle.setChecked(true);
                 swVideo.setChecked(true);
-
                 break;
             case R.id.clean_btn:
                 if (tvKeepTitleNum.getText() != null && !tvKeepTitleNum.getText().toString().equals("")) {
@@ -174,15 +191,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startService() {
-        Intent intent = new Intent(this, MyAccessibilityService.class);
-        intent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
-        intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
-        intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
-        intent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
-        intent.putExtra("enable_article", swArticle.isChecked());
-        intent.putExtra("enable_video", swVideo.isChecked());
+        startService(createIntent());
+    }
 
-        startService(intent);
+    private void startActivity(String packageName, String className) {
+        Intent intent = new Intent();
+        intent.setPackage(packageName);
+        intent.setClassName(packageName, className);
+        this.startActivity(intent);
     }
 
     @Override

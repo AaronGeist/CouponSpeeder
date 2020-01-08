@@ -117,8 +117,50 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/alipay_cmb_token"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="支付宝招行口令"
+                    tools:layout_editor_absoluteX="24dp"
+                    tools:layout_editor_absoluteY="131dp" />
+
+                <EditText
+                    android:id="@+id/alipay_cmb_token_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="114dp" />
+
+                <TextView
+                    android:id="@+id/password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="支付宝/微信密码"
+                    tools:layout_editor_absoluteX="24dp"
+                    tools:layout_editor_absoluteY="131dp" />
+
+                <EditText
+                    android:id="@+id/password_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPassword"
+                    tools:layout_editor_absoluteX="99dp"
+                    tools:layout_editor_absoluteY="114dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:paddingLeft="160dp">
 
                 <Button
                     android:id="@+id/saveBtn"
@@ -147,46 +189,59 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#F4FF81"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <Button
                 android:id="@+id/setting_btn"
-                android:layout_width="120dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="#80D8FF"
-                android:text="授权" />
+                android:text="授权"
+                android:textSize="17dp" />
 
             <Button
                 android:id="@+id/start_party_btn"
-                android:layout_width="120dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="#B9F6CA"
-                android:text="学习强国" />
+                android:text="学习强国"
+                android:textSize="17dp" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="保留标题数目" />
+            android:background="#FFF59D"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/keep_title_tv"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="保留标题数目" />
 
-        <Button
-            android:id="@+id/clean_btn"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="清理历史标题" />
+            <EditText
+                android:id="@+id/keep_title_tv"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/clean_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="3dp"
+                android:background="#EE00B0FF"
+                android:text="清理" />
+        </LinearLayout>
 
 
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

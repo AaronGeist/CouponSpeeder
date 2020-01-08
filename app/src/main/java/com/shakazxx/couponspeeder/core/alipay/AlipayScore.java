@@ -16,8 +16,19 @@ public class AlipayScore extends BaseAction {
 
     private BitSet enable = new BitSet(2);
 
-    public AlipayScore(AccessibilityService accessibilityService) {
+    private String token;
+    private String password;
+
+    public AlipayScore(AccessibilityService accessibilityService, Bundle bundle) {
         super(accessibilityService);
+
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+
+        token = bundle.getString("alipay_cmb_token", "新春补贴");
+        password = bundle.getString("password");
+
     }
 
     public void cmbScore() {
@@ -48,17 +59,17 @@ public class AlipayScore extends BaseAction {
             return false;
         }
 
-        AccessibilityNodeInfo switcher = CommonUtil.findFirstNodeByText(accessibilityService, null, "密码登录");
-        if (!CommonUtil.click(switcher, 1000)) {
-            return false;
-        }
+//        AccessibilityNodeInfo switcher = CommonUtil.findFirstNodeByText(accessibilityService, null, "密码登录");
+//        if (!CommonUtil.click(switcher, 1000)) {
+//            return false;
+//        }
 
         AccessibilityNodeInfo pwd = CommonUtil.findFirstNodeByText(accessibilityService, null, "请输入登录密码");
         if (pwd == null) {
             return false;
         }
 
-        CommonUtil.inputText(pwd, "1234qwerasdf");
+        CommonUtil.inputText(pwd, password);
 
         AccessibilityNodeInfo btn = CommonUtil.findFirstByViewId(accessibilityService, null, "com.ali.user.mobile.security.ui:id/loginButton");
 
@@ -67,13 +78,13 @@ public class AlipayScore extends BaseAction {
     }
 
     private boolean enter() {
-        AccessibilityNodeInfo tab = CommonUtil.findFirstNodeByText(accessibilityService, "朋友", 10000, 1000);
+        AccessibilityNodeInfo tab = CommonUtil.findFirstNodeByText(accessibilityService, "朋友", 15000, 1000);
 
-        if (!CommonUtil.click(tab, 3000)) {
+        if (!CommonUtil.click(tab, 1000)) {
             return false;
         }
 
-        AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "招商银行信用卡");
+        AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, "招商银行信用卡", 15000, 1000);
 
         Rect rect = new Rect();
         node.getBoundsInScreen(rect);
@@ -89,7 +100,7 @@ public class AlipayScore extends BaseAction {
 
         GestureUtil.click(accessibilityService, getWidth() - 50, getHeight() - 20, 3000);
 
-        AccessibilityNodeInfo item = CommonUtil.findFirstNodeByText(accessibilityService, null, "打卡领积分");
+        AccessibilityNodeInfo item = CommonUtil.findFirstNodeByText(accessibilityService, "打卡领积分", 15000, 1000);
         if (!CommonUtil.click(item, 10000)) {
             return false;
         }
@@ -119,7 +130,7 @@ public class AlipayScore extends BaseAction {
             input.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
 
             Bundle arguments = new Bundle();
-            arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "秋日补贴");
+            arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, token);
             input.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
 
             nodes = CommonUtil.findAllByViewId(accessibilityService, null, "com.alipay.mobile.pubsvc:id/sendBtn");
@@ -127,7 +138,7 @@ public class AlipayScore extends BaseAction {
                 return false;
             }
 
-            int waitTime = r.nextInt(30000) + 30000;
+            int waitTime = r.nextInt(5000) + 5000;
             if (cnt >= maxCnt) {
                 waitTime = 1000;
             }
@@ -136,5 +147,15 @@ public class AlipayScore extends BaseAction {
 
         enable.set(1);
         return true;
+    }
+
+    private void goHomePage() {
+        while (true) {
+            if (CommonUtil.findFirstNodeByText(accessibilityService, null, "首页") != null) {
+                return;
+            }
+
+            CommonUtil.globalBack(accessibilityService, 1000);
+        }
     }
 }
