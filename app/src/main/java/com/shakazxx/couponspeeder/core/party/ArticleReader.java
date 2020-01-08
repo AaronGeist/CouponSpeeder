@@ -117,4 +117,9 @@ public class ArticleReader extends BaseLearner {
     int getRequiredEntryCnt() {
         return articleNum;
     }
+
+    @Override
+    int expectScoreIncr() {
+        return 14;
+    }
 }

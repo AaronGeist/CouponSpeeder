@@ -22,9 +22,6 @@ public abstract class BaseLearner extends BaseAction {
     // do not scroll down forever, if no item found, return
     private static final int MAX_SCROLL_DOWN_CNT = 100;
 
-    // 预期每种类型增加的分数
-    public static final int EXPECT_SCORE_INCR = 12;
-
     // local variables
     protected boolean enable = true;
 
@@ -124,7 +121,7 @@ public abstract class BaseLearner extends BaseAction {
                             }
 
                             // 分数增长达到目标，可以提前结束
-                            if (currentScore - initScore >= EXPECT_SCORE_INCR) {
+                            if (currentScore - initScore >= expectScoreIncr()) {
                                 break;
                             }
 
@@ -171,6 +168,9 @@ public abstract class BaseLearner extends BaseAction {
 
     // 需要学习的数量
     abstract int getRequiredEntryCnt();
+
+    // 预期每种类型增加的分数
+    abstract int expectScoreIncr();
 
 
 }

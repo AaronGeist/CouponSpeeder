@@ -39,4 +39,9 @@ public class LocalChannel extends BaseLearner {
     int getRequiredEntryCnt() {
         return 1;
     }
+
+    @Override
+    int expectScoreIncr() {
+        return 1;
+    }
 }

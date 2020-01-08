@@ -104,4 +104,9 @@ public class VideoReader extends BaseLearner {
         return videoNum;
     }
 
+    @Override
+    int expectScoreIncr() {
+        return 12;
+    }
+
 }
