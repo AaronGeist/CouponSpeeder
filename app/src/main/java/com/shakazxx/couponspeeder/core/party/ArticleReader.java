@@ -120,6 +120,6 @@ public class ArticleReader extends BaseLearner {
 
     @Override
     int expectScoreIncr() {
-        return 14;
+        return 16;
     }
 }
