@@ -111,18 +111,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initCfg() {
         try {
             String json = FileUtil.readAll(CONFIG_FILE_PATH);
-            JSONObject jsonObject = new JSONObject(json);
-            tvArticleNum.setText(jsonObject.getString("article_num"));
-            tvArticleTime.setText(jsonObject.getString("article_time"));
-            tvVideoNum.setText(jsonObject.getString("video_num"));
-            tvVideoTime.setText(jsonObject.getString("video_time"));
-            swArticle.setChecked(jsonObject.getBoolean("enable_article"));
-            swVideo.setChecked(jsonObject.getBoolean("enable_video"));
+            if ("".equals(json) || json == null) {
+                tvArticleNum.setText("0");
+                tvArticleTime.setText("0");
+                tvVideoNum.setText("0");
+                tvVideoTime.setText("0");
+                swArticle.setChecked(true);
+                swVideo.setChecked(true);
 
-            tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
-            tvAlipayCmbToken.setText(jsonObject.getString("alipay_cmb_token"));
-            tvPassword.setText(jsonObject.getString("password"));
+                tvKeepTitleNum.setText("1");
+                tvAlipayCmbToken.setText("aaa");
+                tvPassword.setText("aaa");
+            } else {
+                JSONObject jsonObject = new JSONObject(json);
+                tvArticleNum.setText(jsonObject.getString("article_num"));
+                tvArticleTime.setText(jsonObject.getString("article_time"));
+                tvVideoNum.setText(jsonObject.getString("video_num"));
+                tvVideoTime.setText(jsonObject.getString("video_time"));
+                swArticle.setChecked(jsonObject.getBoolean("enable_article"));
+                swVideo.setChecked(jsonObject.getBoolean("enable_video"));
 
+                tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
+                tvAlipayCmbToken.setText(jsonObject.getString("alipay_cmb_token"));
+                tvPassword.setText(jsonObject.getString("password"));
+            }
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
@@ -166,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     FileUtil.writeLine(CONFIG_FILE_PATH, jsonObject.toString(), false);
                 } catch (Exception e) {
-
+                    Log.d(TAG, e.getMessage());
                 }
 
                 startService(createIntent());
@@ -188,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
-    }
+     }
 
     private void startService() {
         startService(createIntent());
