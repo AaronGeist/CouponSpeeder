@@ -42,7 +42,7 @@ public class PartyStudent {
     private void readArticle() {
         @SuppressLint("SimpleDateFormat")
         String date = new SimpleDateFormat("yyyy").format(new Date());
-        if (articleReader.findEntrance("学习")) {
+        if (articleReader.findEntrance("工作")) {
             if (articleReader.findEntrance("推荐")) {
                 articleReader.processSingle(date);
             }
@@ -61,7 +61,7 @@ public class PartyStudent {
     }
 
     private void localChannel() {
-        if (localChannel.findEntrance("学习")) {
+        if (localChannel.findEntrance("工作")) {
             if (localChannel.findEntrance("上海")) {
                 localChannel.processSingle("");
             }
