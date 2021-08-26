@@ -13,17 +13,22 @@ public class PartyStudent {
     private ArticleReader articleReader;
     private VideoReader videoReader;
     private LocalChannel localChannel;
+    private Quiz quiz;
+
     private Login login;
 
     public PartyStudent(AccessibilityService service, Bundle bundle) {
         login = new Login(service);
+
         articleReader = new ArticleReader(service, bundle);
         videoReader = new VideoReader(service, bundle);
         localChannel = new LocalChannel(service, bundle);
+        quiz = new Quiz(service, bundle);
     }
 
     public void learn() {
         login();
+        challengeQuiz();
         readArticle();
         watchVideo();
         localChannel();
@@ -45,6 +50,14 @@ public class PartyStudent {
         if (articleReader.findEntrance("工作")) {
             if (articleReader.findEntrance("推荐")) {
                 articleReader.processSingle(date);
+            }
+        }
+    }
+
+    private void challengeQuiz() {
+        if (quiz.findEntrance("我的")) {
+            if (quiz.findEntrance("我要答题")) {
+                quiz.processSingle("");
             }
         }
     }

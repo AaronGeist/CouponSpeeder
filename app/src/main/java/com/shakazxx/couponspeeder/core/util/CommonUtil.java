@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK;
 
@@ -82,7 +84,7 @@ public class CommonUtil {
         return nodes.get(0);
     }
 
-    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityService service, AccessibilityNodeInfo root, String nodeClassName) {
+    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityService service, AccessibilityNodeInfo root, String nodeClassName, String text) {
         if (root == null) {
             root = service.getRootInActiveWindow();
         }
@@ -91,18 +93,70 @@ public class CommonUtil {
             return null;
         }
 
-        if (root.getClassName().toString().equalsIgnoreCase(nodeClassName)) {
+        if (root.getClassName().toString().equalsIgnoreCase(nodeClassName) && root.getContentDescription() != null && root.getContentDescription().toString().contains(text)) {
             return root;
         }
 
         int maxIndex = root.getChildCount();
         for (int i = 0; i < maxIndex; i++) {
-            AccessibilityNodeInfo node = findFirstNodeByClassName(service, root.getChild(i), nodeClassName);
+            AccessibilityNodeInfo node = findFirstNodeByClassName(service, root.getChild(i), nodeClassName, text);
             if (node != null)
                 return node;
         }
 
         return null;
+    }
+
+    public static Map<String, AccessibilityNodeInfo> findAllText(AccessibilityService service, AccessibilityNodeInfo root) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+
+        if (root == null) {
+            return null;
+        }
+
+        Map<String, AccessibilityNodeInfo> result = new HashMap<>();
+
+        if (root.getText() != null) {
+            result.put(root.getText().toString(), root);
+        }
+
+        int maxIndex = root.getChildCount();
+        for (int i = 0; i < maxIndex; i++) {
+            Map<String, AccessibilityNodeInfo> res = findAllText(service, root.getChild(i));
+            if (res != null) {
+                result.putAll(res);
+            }
+        }
+
+        return result;
+    }
+
+    public static Map<String, AccessibilityNodeInfo> findAllDesc(AccessibilityService service, AccessibilityNodeInfo root) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+
+        if (root == null) {
+            return null;
+        }
+
+        Map<String, AccessibilityNodeInfo> result = new HashMap<>();
+
+        if (root.getContentDescription() != null) {
+            result.put(root.getContentDescription().toString(), root);
+        }
+
+        int maxIndex = root.getChildCount();
+        for (int i = 0; i < maxIndex; i++) {
+            Map<String, AccessibilityNodeInfo> res = findAllDesc(service, root.getChild(i));
+            if (res != null) {
+                result.putAll(res);
+            }
+        }
+
+        return result;
     }
 
     public static void inputText(AccessibilityNodeInfo inputNode, String text) {
