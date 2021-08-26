@@ -84,12 +84,12 @@ public class ArticleReader extends BaseLearner {
         List<AccessibilityNodeInfo> elements = CommonUtil.findAllByText(accessibilityService, null, "欢迎发表你的观点");
         if (elements.size() > 0) {
             // 收藏
-            GestureUtil.click(accessibilityService, getWidth() - 200, getHeight(), 1000);
+            GestureUtil.click(accessibilityService, getWidth() - 200, getHeight() - 50, 1000);
 
             // 分享
             if (shareCnt < REQUIRED_SHARE_CNT) {
                 shareCnt++;
-                GestureUtil.click(accessibilityService, getWidth() - 100, getHeight(), 1000);
+                GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 50, 1000);
                 AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
                 if (newRoot == null) {
                     return;
@@ -103,7 +103,7 @@ public class ArticleReader extends BaseLearner {
 
             if (commentCnt < REQUIRED_COMMENT_CNT) {
                 commentCnt++;
-                GestureUtil.click(accessibilityService, 200, getHeight() , 1000);
+                GestureUtil.click(accessibilityService, 200, getHeight() - 50 , 1000);
                 AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "好观点将会被优先展示");
                 if (node != null) {
                     CommonUtil.inputText(node, CommentDict.pick());
