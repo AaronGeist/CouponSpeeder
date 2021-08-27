@@ -28,10 +28,10 @@ public class PartyStudent {
 
     public void learn() {
         login();
-        challengeQuiz();
         readArticle();
         watchVideo();
         localChannel();
+        challengeQuiz();
     }
 
     public void stop() {

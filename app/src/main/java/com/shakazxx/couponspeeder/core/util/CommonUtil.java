@@ -2,6 +2,7 @@ package com.shakazxx.couponspeeder.core.util;
 
 import android.accessibilityservice.AccessibilityService;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class CommonUtil {
 
         Map<String, AccessibilityNodeInfo> result = new HashMap<>();
 
-        if (root.getText() != null) {
+        if (root.getText() != null && root.getText() != "") {
             result.put(root.getText().toString(), root);
         }
 
@@ -255,5 +256,18 @@ public class CommonUtil {
     public static void globalBack(AccessibilityService service, int delayTime) {
         service.performGlobalAction(GLOBAL_ACTION_BACK);
         sleep(delayTime);
+    }
+
+    public static String getLongest(List<String> words) {
+        String res = "";
+        int maxLen = -1;
+        for (String word : words) {
+            if (word.length() > maxLen) {
+                res = word;
+                maxLen = word.length();
+            }
+        }
+
+        return res;
     }
 }
