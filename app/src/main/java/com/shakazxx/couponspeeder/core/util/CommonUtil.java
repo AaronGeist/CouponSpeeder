@@ -239,6 +239,35 @@ public class CommonUtil {
         return null;
     }
 
+    public static AccessibilityNodeInfo findFirstNodeByDesc(AccessibilityService service, AccessibilityNodeInfo root, String text) {
+        if (root == null) {
+            root = service.getRootInActiveWindow();
+        }
+
+        if (root == null) {
+            return null;
+        }
+
+        if (root.getContentDescription() != null && text.equalsIgnoreCase(root.getContentDescription().toString())) {
+            return root;
+        }
+
+        int maxIndex = root.getChildCount();
+        for (int i = 0; i < maxIndex; i++) {
+            AccessibilityNodeInfo child = root.getChild(i);
+            if (child == null) {
+                continue;
+            }
+
+            AccessibilityNodeInfo node = findFirstNodeByDesc(service, child, text);
+            if (node != null) {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
     public static boolean click(AccessibilityNodeInfo node, int delayTime) {
         if (node == null) {
             return false;

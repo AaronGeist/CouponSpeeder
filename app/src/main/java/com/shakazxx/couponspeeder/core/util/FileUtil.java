@@ -72,4 +72,11 @@ public class FileUtil {
 
         return msg.toString();
     }
+
+    public static void remove(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
 }

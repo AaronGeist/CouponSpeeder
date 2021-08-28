@@ -4,6 +4,9 @@ import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import com.shakazxx.couponspeeder.core.util.FileUtil;
+import com.shakazxx.couponspeeder.core.util.TessUtil;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,7 +17,7 @@ public class PartyStudent {
     private VideoReader videoReader;
     private LocalChannel localChannel;
     private Quiz quiz;
-
+    private Subscription subscription;
     private Login login;
 
     public PartyStudent(AccessibilityService service, Bundle bundle) {
@@ -24,10 +27,12 @@ public class PartyStudent {
         videoReader = new VideoReader(service, bundle);
         localChannel = new LocalChannel(service, bundle);
         quiz = new Quiz(service, bundle);
+        subscription = new Subscription(service, bundle);
     }
 
     public void learn() {
         login();
+//        subscribe();
         readArticle();
         watchVideo();
         localChannel();
@@ -38,6 +43,7 @@ public class PartyStudent {
         articleReader.stop();
         videoReader.stop();
         localChannel.stop();
+        quiz.stop();
     }
 
     private void login() {
@@ -58,6 +64,14 @@ public class PartyStudent {
         if (quiz.findEntrance("我的")) {
             if (quiz.findEntrance("我要答题")) {
                 quiz.processSingle("");
+            }
+        }
+    }
+
+    private void subscribe() {
+        if (subscription.findEntrance("我的")) {
+            if (subscription.findEntrance("订阅")) {
+                subscription.processSingle("");
             }
         }
     }
