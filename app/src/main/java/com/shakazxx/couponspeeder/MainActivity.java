@@ -182,8 +182,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
                     jsonObject.put("enable_article", swArticle.isChecked());
                     jsonObject.put("enable_video", swVideo.isChecked());
-                    jsonObject.put("enable_single_quiz", swTwoPersonQuiz.isChecked());
-                    jsonObject.put("enable_two_person_quiz", swVideo.isChecked());
+                    jsonObject.put("enable_single_quiz", swSingleQuiz.isChecked());
+                    jsonObject.put("enable_two_person_quiz", swTwoPersonQuiz.isChecked());
                     jsonObject.put("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
                     jsonObject.put("password", tvPassword.getText().toString());
 
