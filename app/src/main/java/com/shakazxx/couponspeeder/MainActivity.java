@@ -153,10 +153,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
         intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
         intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
+        intent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
         intent.putExtra("enable_article", swArticle.isChecked());
-        intent.putExtra("enable_video", swSingleQuiz.isChecked());
-        intent.putExtra("enable_single_quiz", swTwoPersonQuiz.isChecked());
-        intent.putExtra("enable_two_person_quiz", swVideo.isChecked());
+        intent.putExtra("enable_video", swVideo.isChecked());
+        intent.putExtra("enable_single_quiz", swSingleQuiz.isChecked());
+        intent.putExtra("enable_two_person_quiz", swTwoPersonQuiz.isChecked());
         intent.putExtra("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
         intent.putExtra("password", tvPassword.getText().toString());
 
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
-     }
+    }
 
     private void startService() {
         startService(createIntent());

@@ -37,6 +37,7 @@ public class VideoReader extends BaseLearner {
 
     @Override
     boolean processEntry(String title) {
+        Log.d(TAG, "Processing, " + videoReadTimeInSecondsLeft + " seconds left");
         long startTime = System.currentTimeMillis();
         long endTime;
         boolean videoEnd = false;
@@ -44,9 +45,11 @@ public class VideoReader extends BaseLearner {
             endTime = System.currentTimeMillis();
             // 累计时间到了，不看了
             if (endTime - startTime > videoReadTimeInSecondsLeft * 1000) {
+                Log.d(TAG, "Congrs, Times up!");
                 break;
             }
 
+            Log.d(TAG, (endTime - startTime)/1000 + "ms elapsed...not finished yet");
             // 视频结束了
             if (CommonUtil.findFirstNodeByText(accessibilityService, null, "重新播放") != null) {
                 videoEnd = true;
@@ -69,6 +72,7 @@ public class VideoReader extends BaseLearner {
                 int x = r.nextInt(10) + 200;
                 int y = r.nextInt(50) + 400;
                 GestureUtil.scrollRight(accessibilityService, x, y, 400);
+                Log.d(TAG, "Fast play " + scrollCnt + " times");
 
                 scrollCnt++;
                 if (scrollCnt > MAX_SCROLL_CNT) {
@@ -76,7 +80,7 @@ public class VideoReader extends BaseLearner {
                     return false;
                 }
 
-                sleep(r.nextInt(1000) + 1000);
+                sleep(r.nextInt(1000) + 3000);
             }
 
             // 回退一下自动播放到结尾

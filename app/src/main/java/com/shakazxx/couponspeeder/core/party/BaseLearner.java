@@ -135,7 +135,8 @@ public abstract class BaseLearner extends BaseAction {
             }
 
             if (currentCnt < getRequiredEntryCnt()) {
-                GestureUtil.scrollDown(accessibilityService, 500);
+                GestureUtil.scrollDown(accessibilityService, getHeight() / 2);
+                Log.d(TAG, "Need more entry, scrolling down");
                 currScrollCnt++;
                 sleep(800);
             }
