@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Switch swArticle;
     private Switch swVideo;
+    private Switch swSingleQuiz;
+    private Switch swTwoPersonQuiz;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         swArticle = findViewById(R.id.switchArticle);
         swVideo = findViewById(R.id.switchVideo);
+        swSingleQuiz = findViewById(R.id.switchSingleQuiz);
+        swTwoPersonQuiz = findViewById(R.id.switchTwoPersonQuiz);
 
         btnSettings.setOnClickListener(this);
         btnSave.setOnClickListener(this);
@@ -118,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvVideoTime.setText("0");
                 swArticle.setChecked(true);
                 swVideo.setChecked(true);
+                swSingleQuiz.setChecked(true);
+                swTwoPersonQuiz.setChecked(true);
 
                 tvKeepTitleNum.setText("1");
                 tvAlipayCmbToken.setText("aaa");
@@ -130,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvVideoTime.setText(jsonObject.getString("video_time"));
                 swArticle.setChecked(jsonObject.getBoolean("enable_article"));
                 swVideo.setChecked(jsonObject.getBoolean("enable_video"));
+                swSingleQuiz.setChecked(jsonObject.getBoolean("enable_single_quiz"));
+                swTwoPersonQuiz.setChecked(jsonObject.getBoolean("enable_two_person_quiz"));
 
                 tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
                 tvAlipayCmbToken.setText(jsonObject.getString("alipay_cmb_token"));
@@ -146,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
         intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
         intent.putExtra("enable_article", swArticle.isChecked());
-        intent.putExtra("enable_video", swVideo.isChecked());
+        intent.putExtra("enable_video", swSingleQuiz.isChecked());
+        intent.putExtra("enable_single_quiz", swTwoPersonQuiz.isChecked());
+        intent.putExtra("enable_two_person_quiz", swVideo.isChecked());
         intent.putExtra("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
         intent.putExtra("password", tvPassword.getText().toString());
 
@@ -172,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
                     jsonObject.put("enable_article", swArticle.isChecked());
                     jsonObject.put("enable_video", swVideo.isChecked());
+                    jsonObject.put("enable_single_quiz", swTwoPersonQuiz.isChecked());
+                    jsonObject.put("enable_two_person_quiz", swVideo.isChecked());
                     jsonObject.put("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
                     jsonObject.put("password", tvPassword.getText().toString());
 
@@ -191,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_TIME));
                 swArticle.setChecked(true);
                 swVideo.setChecked(true);
+                swSingleQuiz.setChecked(true);
+                swTwoPersonQuiz.setChecked(true);
                 break;
             case R.id.clean_btn:
                 if (tvKeepTitleNum.getText() != null && !tvKeepTitleNum.getText().toString().equals("")) {

@@ -105,7 +105,7 @@
                 android:id="@+id/switchArticle"
                 android:layout_width="match_parent"
                 android:layout_height="11dp"
-                android:text="是否读文章"
+                android:text="读文章"
                 tools:checked="true" />
 
             <Switch
@@ -113,7 +113,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="是否看视频" />
+                android:text="看视频" />
+
+            <Switch
+                android:id="@+id/switchSingleQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="挑战答题" />
+
+            <Switch
+                android:id="@+id/switchTwoPersonQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="双人对战" />
 
             <LinearLayout
                 android:layout_width="match_parent"

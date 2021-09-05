@@ -28,9 +28,15 @@ public class Quiz extends BaseLearner {
 
     AnswerUtil answerUtil = new AnswerUtil();
     List<String> prefix = Arrays.asList("a", "b", "c", "d", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+    boolean singleQuizEnable;
+    boolean twoPersonQuizEnable;
 
     public Quiz(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
+
+        singleQuizEnable = bundle.getBoolean("enable_single_quiz", true);
+        twoPersonQuizEnable = bundle.getBoolean("enable_two_person_quiz", true);
+        enable = singleQuizEnable || twoPersonQuizEnable;
     }
 
     @Override
