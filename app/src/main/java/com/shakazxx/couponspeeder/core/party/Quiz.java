@@ -81,6 +81,10 @@ public class Quiz extends BaseLearner {
     }
 
     private void twoPersonQuiz() {
+        if (!twoPersonQuizEnable) {
+            return;
+        }
+
         // go to inner page and start
         GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 800, 2000);
         GestureUtil.click(accessibilityService, getWidth() - 300, getHeight() / 2, 10000);
@@ -261,6 +265,10 @@ public class Quiz extends BaseLearner {
     }
 
     private void singleQuiz() {
+        if (!singleQuizEnable) {
+            return;
+        }
+
         GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 300, 5000);
 
         // retry to avoid entering page too fast
@@ -303,7 +311,7 @@ public class Quiz extends BaseLearner {
             if (i == 5) {
                 // choose wrong answer
                 for (String text : allTextNodes.keySet()) {
-                    if (!answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
+                    if (text != null && !answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
                         answerNode = allTextNodes.get(text);
                         Log.d(TAG, "singleQuiz: choose wrong answer" + text);
                         break;
