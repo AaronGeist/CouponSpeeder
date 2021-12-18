@@ -265,8 +265,17 @@ public class Quiz extends BaseLearner {
     }
 
     private void singleQuiz() {
+        // enable retry
+        for (int i = 0; i < 15; i++) {
+            if (doSingleQuiz()) {
+                break;
+            }
+        }
+    }
+
+    private boolean doSingleQuiz() {
         if (!singleQuizEnable) {
-            return;
+            return true;
         }
 
         GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 300, 5000);
@@ -311,7 +320,7 @@ public class Quiz extends BaseLearner {
             if (i == 5) {
                 // choose wrong answer
                 for (String text : allTextNodes.keySet()) {
-                    if (text != null && !answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
+                    if (text != null && answer != null && !answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
                         answerNode = allTextNodes.get(text);
                         Log.d(TAG, "singleQuiz: choose wrong answer" + text);
                         break;
@@ -324,6 +333,13 @@ public class Quiz extends BaseLearner {
             if (answerNode != null) {
                 CommonUtil.click(answerNode, 100);
                 CommonUtil.sleep(2000);
+            } else {
+                // Cannot find answer, maybe there's no answer for current quiz, might need to retry
+                Log.d(TAG, "singleQuiz: cannot find answer, quit and retry");
+                // quit
+                CommonUtil.globalBack(accessibilityService, 1000);
+                CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
+                return false;
             }
         }
 
@@ -337,6 +353,7 @@ public class Quiz extends BaseLearner {
             CommonUtil.sleep(5000);
         }
 
+        return true;
     }
 
     private String normalizeText(String text) {
