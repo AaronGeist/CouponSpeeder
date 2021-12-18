@@ -104,29 +104,41 @@
             <Switch
                 android:id="@+id/switchArticle"
                 android:layout_width="match_parent"
-                android:layout_height="11dp"
+                android:layout_height="40dp"
                 android:text="读文章"
+                android:textSize="16sp"
                 tools:checked="true" />
 
             <Switch
                 android:id="@+id/switchVideo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:checked="true"
+                android:textSize="16sp"
                 android:text="看视频" />
+
+            <Switch
+                android:id="@+id/switchTV"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:textSize="16sp"
+                android:text="本地电视" />
 
             <Switch
                 android:id="@+id/switchSingleQuiz"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:checked="true"
+                android:textSize="16sp"
                 android:text="挑战答题" />
 
             <Switch
                 android:id="@+id/switchTwoPersonQuiz"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:checked="true"
+                android:textSize="16sp"
                 android:text="双人对战" />
 
             <LinearLayout
