@@ -38,6 +38,8 @@ public abstract class BaseLearner extends BaseAction {
 
     private static final Pattern timePattern = Pattern.compile("[0-9]{2}:[0-9]{2}");
 
+    private static final String VIDEO_CLASS_NAME = "android.widget.FrameLayout";
+
     // constructor
     public BaseLearner(AccessibilityService service, Bundle bundle) {
         super(service);
@@ -126,53 +128,69 @@ public abstract class BaseLearner extends BaseAction {
 
                     AccessibilityNodeInfo btn = entry.getParent();
                     String title = btn.getChild(0).getText().toString().trim();
+                    String potentialTime = "";
+                    String childClassName = "";
+                    if (btn.getChildCount() > 3) {
+                        // 如果是视频，下列属性会是特殊的值
+                        potentialTime = btn.getChild(3).getText().toString().trim();
+                        childClassName = btn.getChild(1).getClassName().toString();
+                    }
+
+                    boolean containsVideo = false;
                     if (timePattern.matcher(title).find()) {
                         // 标题拿到的是视频的时长
                         title = btn.getChild(1).getText().toString().trim();
                         Log.d(TAG, "修正标题：" + title);
 
-                        // 读文章的时候不要看视频
-                        if (skipVideo()) {
-                            Log.d(TAG, "跳过视频：" + title);
-
-                            continue;
-                        }
+                        containsVideo = true;
                     }
 
-                    if (processedTitles.contains(title)) {
-                        Log.d(TAG, "已经读过/看过：" + title);
+                    if (VIDEO_CLASS_NAME.equals(childClassName) || timePattern.matcher(potentialTime).find()) {
+                        containsVideo = true;
+                    }
+
+                    if (processedTitles.contains(title) || readTitles.contains(title)) {
+                        // 已经看过，跳过
                         continue;
                     }
 
-                    if (!readTitles.contains(title)) {
-                        // 发现不重复项
-                        readTitles.add(title);
-                        Log.d(TAG, ">>>>>>>>> 发现新内容：" + title + " >>>>>>>>>>>>>");
+                    // 读文章的时候不要看视频
+                    if (containsVideo && skipVideo()) {
+                        Log.d(TAG, "跳过视频：" + title);
+                        continue;
+                    }
 
-                        if (CommonUtil.click(btn, 1000)) {
-                            if (processEntry(title)) {
-                                // 记录数据
-                                historyRecord.writeData(title);
-                                currentCnt++;
-                            }
-                            CommonUtil.globalBack(accessibilityService, 1000);
+                    // 发现不重复项
+                    readTitles.add(title);
+                    Log.d(TAG, ">>>>>>>>> 发现新内容：" + title + " >>>>>>>>>>>>>");
 
-                            int currentScore = getScore();
-                            if (initScore == -1) {
-                                initScore = currentScore;
-                            }
+                    if (title.contains("盗墓笔记")) {
+                        continue;
+                    }
+                    if (CommonUtil.click(btn, 1000)) {
+                        if (processEntry(title)) {
+                            // 记录数据
+                            historyRecord.writeData(title);
+                            currentCnt++;
+                        }
+                        CommonUtil.globalBack(accessibilityService, 1000);
 
-                            Log.d(TAG, String.format("状态：新增积分=%d，新增计数=%d", (currentScore - initScore), currentCnt));
-                            // 分数增长达到目标，可以提前结束
-                            if (currentScore - initScore >= expectScoreIncr()) {
-                                break;
-                            }
+                        int currentScore = getScore();
+                        if (initScore == -1) {
+                            initScore = currentScore;
+                        }
 
-                            if (currentCnt >= getRequiredEntryCnt()) {
-                                break;
-                            }
+                        Log.d(TAG, String.format("状态：新增积分=%d，新增计数=%d", (currentScore - initScore), currentCnt));
+                        // 分数增长达到目标，可以提前结束
+                        if (currentScore - initScore >= expectScoreIncr()) {
+                            break;
+                        }
+
+                        if (currentCnt >= getRequiredEntryCnt()) {
+                            break;
                         }
                     }
+
                 } catch (Exception e) {
                 }
             }
