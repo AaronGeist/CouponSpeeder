@@ -16,9 +16,9 @@ public class ArticleReader extends BaseLearner {
 
     private final String TAG = getClass().getSimpleName();
 
-    public static final int DEFAULT_TIME_IN_SECOND = 130;  //等待时间  130
+    public static final int DEFAULT_TIME_IN_SECOND = 70;  // 单篇文章等待时间
     public static final int DEFAULT_READ_ARTICLE_NUM = 8;
-    public static final int REQUIRED_SHARE_CNT = 4; //分享次数
+    public static final int REQUIRED_SHARE_CNT = 3; // 分享次数
     public static final int REQUIRED_COMMENT_CNT = 2; // 评论次数
     public static final int MAX_SCROLL_DOWN_CNT = 30; // 下滑最大次数
 
@@ -37,9 +37,6 @@ public class ArticleReader extends BaseLearner {
         articleNum = bundle.getInt("article_num", DEFAULT_READ_ARTICLE_NUM);
         articleTime = bundle.getInt("article_time", DEFAULT_TIME_IN_SECOND);
         enable = bundle.getBoolean("enable_article", true);
-
-        Log.d(TAG, "article_num: " + articleNum);
-        Log.d(TAG, "article_time: " + articleTime);
     }
 
     @Override
