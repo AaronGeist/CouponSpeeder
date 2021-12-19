@@ -122,4 +122,9 @@ public class ArticleReader extends BaseLearner {
     int expectScoreIncr() {
         return 16;
     }
+
+    @Override
+    protected boolean skipVideo() {
+        return true;
+    }
 }

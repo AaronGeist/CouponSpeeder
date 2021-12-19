@@ -12,6 +12,7 @@ import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
 
@@ -34,6 +35,8 @@ public abstract class BaseLearner extends BaseAction {
 
     // 最初的分数
     private int initScore = -1;
+
+    private static final Pattern timePattern = Pattern.compile("[0-9]{2}:[0-9]{2}");
 
     // constructor
     public BaseLearner(AccessibilityService service, Bundle bundle) {
@@ -84,10 +87,35 @@ public abstract class BaseLearner extends BaseAction {
         int currentCnt = 0;
         int currScrollCnt = 0;
         List<String> readTitles = new ArrayList<>();
+
+        int entryHash4PreviousScreen = 0;
+        int sameEntryCnt = 0;
         while (currentCnt < getRequiredEntryCnt() && currScrollCnt < MAX_SCROLL_DOWN_CNT && !pending) {
             List<AccessibilityNodeInfo> entries = CommonUtil.findAllByText(accessibilityService, null, keyword);
-            for (AccessibilityNodeInfo entry : entries) {
 
+            int currentEntryHash = entries.hashCode();
+            if (currentEntryHash == entryHash4PreviousScreen) {
+                // 下拉后没有新的内容，继续下拉
+                sameEntryCnt++;
+                if (sameEntryCnt >= 10) {
+                    // 连续10次下拉都是一样的东西，加大下拉距离，加载新的
+                    GestureUtil.scrollDown(accessibilityService, getHeight() / 2);
+                    sleep(2000); // 更长距离，需要更多等候时间
+                    sameEntryCnt = 0;
+                    Log.d(TAG, "Same content, scroll down directly and more distance(" + getHeight() / 2 + ")");
+                } else {
+                    GestureUtil.scrollDown(accessibilityService, 400);
+                    sleep(1000);
+                    Log.d(TAG, "Same content, scroll down directly");
+                }
+                currScrollCnt++;
+                Log.d(TAG, "Scrolling Status: " + currScrollCnt + "/" + MAX_SCROLL_DOWN_CNT);
+                continue;
+            }
+
+            entryHash4PreviousScreen = currentEntryHash;
+
+            for (AccessibilityNodeInfo entry : entries) {
                 try {
                     // 屏幕外的部分不要
                     Rect rect = new Rect();
@@ -98,6 +126,19 @@ public abstract class BaseLearner extends BaseAction {
 
                     AccessibilityNodeInfo btn = entry.getParent();
                     String title = btn.getChild(0).getText().toString().trim();
+                    if (timePattern.matcher(title).find()) {
+                        // 标题拿到的是视频的时长
+                        title = btn.getChild(1).getText().toString().trim();
+                        Log.d(TAG, "修正标题：" + title);
+
+                        // 读文章的时候不要看视频
+                        if (skipVideo()) {
+                            Log.d(TAG, "跳过视频：" + title);
+
+                            continue;
+                        }
+                    }
+
                     if (processedTitles.contains(title)) {
                         Log.d(TAG, "已经读过/看过：" + title);
                         continue;
@@ -106,8 +147,9 @@ public abstract class BaseLearner extends BaseAction {
                     if (!readTitles.contains(title)) {
                         // 发现不重复项
                         readTitles.add(title);
+                        Log.d(TAG, ">>>>>>>>> 发现新内容：" + title + " >>>>>>>>>>>>>");
+
                         if (CommonUtil.click(btn, 1000)) {
-                            Log.d(TAG, "进入单项");
                             if (processEntry(title)) {
                                 // 记录数据
                                 historyRecord.writeData(title);
@@ -120,6 +162,7 @@ public abstract class BaseLearner extends BaseAction {
                                 initScore = currentScore;
                             }
 
+                            Log.d(TAG, String.format("状态：新增积分=%d，新增计数=%d", (currentScore - initScore), currentCnt));
                             // 分数增长达到目标，可以提前结束
                             if (currentScore - initScore >= expectScoreIncr()) {
                                 break;
@@ -132,13 +175,6 @@ public abstract class BaseLearner extends BaseAction {
                     }
                 } catch (Exception e) {
                 }
-            }
-
-            if (currentCnt < getRequiredEntryCnt()) {
-                GestureUtil.scrollDown(accessibilityService, getHeight() / 2);
-                Log.d(TAG, "Need more entry, scrolling down");
-                currScrollCnt++;
-                sleep(800);
             }
         }
 
@@ -172,6 +208,11 @@ public abstract class BaseLearner extends BaseAction {
 
     // 预期每种类型增加的分数
     abstract int expectScoreIncr();
+
+    // 是否要看视频，比如读文章就不看
+    protected boolean skipVideo() {
+        return false;
+    }
 
 
 }

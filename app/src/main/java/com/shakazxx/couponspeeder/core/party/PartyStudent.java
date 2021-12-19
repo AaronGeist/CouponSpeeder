@@ -81,7 +81,7 @@ public class PartyStudent {
         @SuppressLint("SimpleDateFormat")
         String date = new SimpleDateFormat("yyyy").format(calendar.getTime());
         if (videoReader.findEntrance("电视台")) {
-            if (videoReader.findEntrance("联播频道")) {
+            if (videoReader.findEntrance("第一频道")) {
                 videoReader.processSingle(date);
             }
         }

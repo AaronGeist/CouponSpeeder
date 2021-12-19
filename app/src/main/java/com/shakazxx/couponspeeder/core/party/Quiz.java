@@ -46,7 +46,7 @@ public class Quiz extends BaseLearner {
         }
 
         singleQuiz();
-        twoPersonQuiz();
+        twoPersonQuizV2();
 //        fourPersonQuiz();
 
         CommonUtil.globalBack(accessibilityService, 1000);
@@ -80,6 +80,106 @@ public class Quiz extends BaseLearner {
         return filePath;
     }
 
+    private void twoPersonQuizV2() {
+        if (!twoPersonQuizEnable) {
+            return;
+        }
+
+        TessUtil.init();
+        cleanupSnapshotFolder();
+
+        // go to inner page and start
+        GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 800, 2000);
+        GestureUtil.click(accessibilityService, getWidth() - 300, getHeight() / 2, 10000);
+
+        for (int i = 0; i < 5; i++) {
+            GestureUtil.click(accessibilityService, 300, getHeight() - 300, 3000);
+
+            String imgPath = takeScreenshot();
+            Log.d(TAG, "twoPersonQuiz: image " + imgPath);
+            assert imgPath != null;
+            Map<String, Rect> ocrTextResult = TessUtil.recognition(imgPath);
+
+            // normalize text
+            Map<String, Rect> normOcrTextResult = new HashMap<>();
+            for (String text : ocrTextResult.keySet()) {
+                Rect rect = ocrTextResult.get(text);
+                if (text.trim().length() <= 1) {
+                    continue;
+                }
+
+                text = normalizeText(text);
+                normOcrTextResult.put(text, rect);
+            }
+            FileUtil.remove(imgPath);
+
+            List<String> keywords = new ArrayList<>(normOcrTextResult.keySet());
+            String question = CommonUtil.getLongest(keywords);
+            Log.d(TAG, "twoPersonQuiz: question:" + question);
+
+            for (String kw : keywords) {
+                Log.d(TAG, "keyword: " + kw);
+            }
+            String answer = answerUtil.find(keywords);
+            Log.d(TAG, "answer: " + answer);
+
+            Rect rect = null;
+            if (answer != null) {
+                answer = normalizeText(answer);
+                Log.d(TAG, "normalized answer: " + answer);
+
+                for (String ocrText : ocrTextResult.keySet()) {
+                    if (ocrText.contains(answer) && !ocrText.equals(question)) {
+                        // calculate pos
+                        rect = ocrTextResult.get(ocrText);
+
+                    }
+                }
+            }
+
+            if (rect == null) {
+                Log.d(TAG, "twoPersonQuiz: no answer, random pick");
+                for (String ocrText : ocrTextResult.keySet()) {
+                    if (!ocrText.startsWith("出题") && !ocrText.equals(question)) {
+                        // calculate pos
+                        rect = ocrTextResult.get(ocrText);
+                    }
+                }
+            }
+
+            Log.d(TAG, rect.left + "-" + rect.right + "-" + rect.top + "-" + rect.bottom);
+            int x = (rect.left + rect.right) / 2;
+            int y = 650 + (rect.top + rect.bottom) / 2;
+            Log.d(TAG, "twoPersonQuiz: click: " + x + " - " + y);
+            GestureUtil.click(accessibilityService, x, y, 10);
+        }
+        TessUtil.close();
+
+        // start quit
+        Log.d(TAG, "twoPersonQuiz: quit");
+
+        for (int i = 0; i < 30; i++) {
+            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "继续挑战");
+            if (node != null) {
+                break;
+            } else {
+                CommonUtil.sleep(1000);
+            }
+        }
+        CommonUtil.globalBack(accessibilityService, 3000);
+
+
+        for (int i = 0; i < 10; i++) {
+            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "随机匹配");
+            if (node != null) {
+                break;
+            } else {
+                CommonUtil.sleep(1000);
+            }
+        }
+        CommonUtil.globalBack(accessibilityService, 3000);
+        CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
+    }
     private void twoPersonQuiz() {
         if (!twoPersonQuizEnable) {
             return;
@@ -248,8 +348,9 @@ public class Quiz extends BaseLearner {
                 }
             }
 
+            Log.d(TAG, rect.left + "-" + rect.right + "-" + rect.top + "-" + rect.bottom);
             int x = (rect.left + rect.right) / 2;
-            int y = 500 + (rect.left + rect.right) / 2;
+            int y = 500 + (rect.top + rect.bottom) / 2;
             Log.d(TAG, "fourPersonQuiz: click: " + x + " - " + y);
 //                        GestureUtil.click(accessibilityService, x, y, 10);
 
