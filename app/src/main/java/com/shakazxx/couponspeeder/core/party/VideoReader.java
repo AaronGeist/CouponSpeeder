@@ -14,11 +14,11 @@ public class VideoReader extends BaseLearner {
     private final String TAG = getClass().getSimpleName();
 
     public static final int DEFAULT_WATCH_CNT = 8;
-    public static final int DEFAULT_OVERALL_TIME = 180 * 6 + 30;
+    public static final int DEFAULT_OVERALL_TIME = 60 * 6;
 
     private int videoReadTimeInSecondsLeft;  //视频观看秒数  180
     private int videoNum;
-    private static final int MAX_SCROLL_CNT = 30;
+    private static final int MAX_WAIT_CNT = 30;
 
     public VideoReader(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
@@ -40,7 +40,7 @@ public class VideoReader extends BaseLearner {
         Log.d(TAG, "Processing, " + videoReadTimeInSecondsLeft + " seconds left");
         long startTime = System.currentTimeMillis();
         long endTime;
-        boolean videoEnd = false;
+        boolean isVideoEnd = false;
         while (!pending) {
             endTime = System.currentTimeMillis();
             // 累计时间到了，不看了
@@ -49,10 +49,10 @@ public class VideoReader extends BaseLearner {
                 break;
             }
 
-            Log.d(TAG, (endTime - startTime)/1000 + "ms elapsed...not finished yet");
+            Log.d(TAG, (endTime - startTime) / 1000 + "ms elapsed...not finished yet");
             // 视频结束了
             if (CommonUtil.findFirstNodeByText(accessibilityService, null, "重新播放") != null) {
-                videoEnd = true;
+                isVideoEnd = true;
                 break;
             }
 
@@ -60,47 +60,32 @@ public class VideoReader extends BaseLearner {
             GestureUtil.click(accessibilityService, getWidth() / 2, getHeight() / 2, 10);
         }
 
-        int scrollCnt = 0;
-        if (!videoEnd) {
-            // 视频还没结束，快进
-            while (!pending) {
+        // 视频还没结束，快进
+        if (!isVideoEnd) {
+            // 点开进度条
+            Log.d(TAG, "快进！");
+            GestureUtil.click(accessibilityService, getWidth() / 2, 300, 500);
+            // 直接点到最后
+            GestureUtil.click(accessibilityService, getWidth() - 270, 675, 500);
+
+            // 2秒检测一次，等待自动放完，最多等60秒
+            int waitCnt = 0;
+            while (!pending && waitCnt <= MAX_WAIT_CNT) {
                 if (CommonUtil.findFirstNodeByText(accessibilityService, null, "重新播放") != null) {
+                    isVideoEnd = true;
                     break;
                 }
 
-                // 没结束？快进
-                int x = r.nextInt(10) + 200;
-                int y = r.nextInt(50) + 400;
-                GestureUtil.scrollRight(accessibilityService, x, y, 400);
-                Log.d(TAG, "Fast play " + scrollCnt + " times");
-
-                scrollCnt++;
-                if (scrollCnt > MAX_SCROLL_CNT) {
-                    // 超过最大快进次数，可能不是视频而是文章，直接返回
-                    return false;
-                }
-
-                sleep(r.nextInt(1000) + 3000);
-            }
-
-            // 回退一下自动播放到结尾
-            GestureUtil.scrollLeft(accessibilityService, 1000, 500, 50);
-            sleep(5000);
-
-            // 等待自动放完
-            while (!pending) {
-                if (CommonUtil.findFirstNodeByText(accessibilityService, null, "重新播放") != null) {
-                    break;
-                }
-
-                sleep(r.nextInt(1000) + 1000);
+                Log.d(TAG, "耐心等待");
+                sleep(2000);
+                waitCnt++;
             }
         }
 
         endTime = System.currentTimeMillis();
         videoReadTimeInSecondsLeft -= (endTime - startTime) / 1000;
 
-        return true;
+        return isVideoEnd;
     }
 
     @Override
