@@ -19,6 +19,7 @@ public class PartyStudent {
     private Quiz quiz;
     private Subscription subscription;
     private Login login;
+    private ScoreReader scoreReader;
 
     public PartyStudent(AccessibilityService service, Bundle bundle) {
         login = new Login(service);
@@ -28,15 +29,17 @@ public class PartyStudent {
         localChannel = new LocalChannel(service, bundle);
         quiz = new Quiz(service, bundle);
         subscription = new Subscription(service, bundle);
+        scoreReader = new ScoreReader(service, bundle);
     }
 
     public void learn() {
         login();
-//        subscribe();
         readArticle();
         watchVideo();
         localChannel();
         challengeQuiz();
+        // getScore();
+        // subscribe();
     }
 
     public void stop() {
@@ -48,6 +51,14 @@ public class PartyStudent {
 
     private void login() {
         login.process();
+    }
+
+    private void getScore() {
+        if (scoreReader.findEntrance("我的")) {
+            if (scoreReader.findEntrance("学习积分")) {
+                scoreReader.processSingle("");
+            }
+        }
     }
 
     private void readArticle() {

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Quiz extends BaseLearner {
@@ -30,13 +31,16 @@ public class Quiz extends BaseLearner {
     List<String> prefix = Arrays.asList("a", "b", "c", "d", "1", "2", "3", "4", "5", "6", "7", "8", "9");
     boolean singleQuizEnable;
     boolean twoPersonQuizEnable;
+    boolean fourPersonQuizEnable;
 
     public Quiz(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
 
         singleQuizEnable = bundle.getBoolean("enable_single_quiz", true);
         twoPersonQuizEnable = bundle.getBoolean("enable_two_person_quiz", true);
-        enable = singleQuizEnable || twoPersonQuizEnable;
+        fourPersonQuizEnable = bundle.getBoolean("enable_four_person_quiz", true);
+
+        enable = singleQuizEnable || twoPersonQuizEnable || fourPersonQuizEnable;
     }
 
     @Override
@@ -47,7 +51,10 @@ public class Quiz extends BaseLearner {
 
         singleQuiz();
         twoPersonQuizV2();
-//        fourPersonQuiz();
+
+        // 四人赛要执行两次
+        fourPersonQuizV2();
+        fourPersonQuizV2();
 
         CommonUtil.globalBack(accessibilityService, 1000);
         CommonUtil.globalBack(accessibilityService, 1000);
@@ -85,85 +92,32 @@ public class Quiz extends BaseLearner {
             return;
         }
 
-        TessUtil.init();
-        cleanupSnapshotFolder();
 
         // go to inner page and start
         GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 800, 2000);
         GestureUtil.click(accessibilityService, getWidth() - 300, getHeight() / 2, 10000);
 
-        for (int i = 0; i < 5; i++) {
-            GestureUtil.click(accessibilityService, 300, getHeight() - 300, 3000);
-
-            String imgPath = takeScreenshot();
-            Log.d(TAG, "twoPersonQuiz: image " + imgPath);
-            assert imgPath != null;
-            Map<String, Rect> ocrTextResult = TessUtil.recognition(imgPath);
-
-            // normalize text
-            Map<String, Rect> normOcrTextResult = new HashMap<>();
-            for (String text : ocrTextResult.keySet()) {
-                Rect rect = ocrTextResult.get(text);
-                if (text.trim().length() <= 1) {
-                    continue;
-                }
-
-                text = normalizeText(text);
-                normOcrTextResult.put(text, rect);
-            }
-            FileUtil.remove(imgPath);
-
-            List<String> keywords = new ArrayList<>(normOcrTextResult.keySet());
-            String question = CommonUtil.getLongest(keywords);
-            Log.d(TAG, "twoPersonQuiz: question:" + question);
-
-            for (String kw : keywords) {
-                Log.d(TAG, "keyword: " + kw);
-            }
-            String answer = answerUtil.find(keywords);
-            Log.d(TAG, "answer: " + answer);
-
-            Rect rect = null;
-            if (answer != null) {
-                answer = normalizeText(answer);
-                Log.d(TAG, "normalized answer: " + answer);
-
-                for (String ocrText : ocrTextResult.keySet()) {
-                    if (ocrText.contains(answer) && !ocrText.equals(question)) {
-                        // calculate pos
-                        rect = ocrTextResult.get(ocrText);
-
-                    }
-                }
-            }
-
-            if (rect == null) {
-                Log.d(TAG, "twoPersonQuiz: no answer, random pick");
-                for (String ocrText : ocrTextResult.keySet()) {
-                    if (!ocrText.startsWith("出题") && !ocrText.equals(question)) {
-                        // calculate pos
-                        rect = ocrTextResult.get(ocrText);
-                    }
-                }
-            }
-
-            Log.d(TAG, rect.left + "-" + rect.right + "-" + rect.top + "-" + rect.bottom);
-            int x = (rect.left + rect.right) / 2;
-            int y = 650 + (rect.top + rect.bottom) / 2;
-            Log.d(TAG, "twoPersonQuiz: click: " + x + " - " + y);
-            GestureUtil.click(accessibilityService, x, y, 10);
+        Random r = new Random();
+        for (int i = 0; i < 20; i++) {
+            // 随机点了，y 轴大概范围是 800 - 1500
+            int x = getWidth() / 2 + r.nextInt(100);
+            int y = 800 + r.nextInt(700);
+            GestureUtil.click(accessibilityService, x, y, 1000);
+            Log.d(TAG, "Random click: " + x + "-" + y);
         }
-        TessUtil.close();
 
         // start quit
         Log.d(TAG, "twoPersonQuiz: quit");
 
-        for (int i = 0; i < 30; i++) {
+        // 等5分钟，足够对手完成了吧
+        for (int i = 0; i < 60; i++) {
             AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "继续挑战");
             if (node != null) {
+                Log.d(TAG, "终于结束了");
                 break;
             } else {
-                CommonUtil.sleep(1000);
+                Log.d(TAG, "还没结束吗？");
+                CommonUtil.sleep(5000);
             }
         }
         CommonUtil.globalBack(accessibilityService, 3000);
@@ -172,14 +126,16 @@ public class Quiz extends BaseLearner {
         for (int i = 0; i < 10; i++) {
             AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "随机匹配");
             if (node != null) {
+                Log.d(TAG, "回到匹配界面");
                 break;
             } else {
                 CommonUtil.sleep(1000);
             }
         }
         CommonUtil.globalBack(accessibilityService, 3000);
-        CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
+        GestureUtil.click(accessibilityService, 300, getHeight() / 2 + 100, 1000); // click quit button
     }
+
     private void twoPersonQuiz() {
         if (!twoPersonQuizEnable) {
             return;
@@ -284,7 +240,47 @@ public class Quiz extends BaseLearner {
         GestureUtil.click(accessibilityService, 300, getHeight() / 2 + 100, 1000); // click quit button
     }
 
+    private void fourPersonQuizV2() {
+        if (!fourPersonQuizEnable) {
+            return;
+        }
+
+        // go to inner page and start
+        GestureUtil.click(accessibilityService, 300, getHeight() - 800, 1000);
+        GestureUtil.click(accessibilityService, 300, getHeight() - 300, 13000);
+
+        Random r = new Random();
+        for (int i = 0; i < 20; i++) {
+            // 随机点了，y轴大概范围是 800 - 1500
+            int x = getWidth() / 2 + r.nextInt(100);
+            int y = 800 + r.nextInt(700);
+            GestureUtil.click(accessibilityService, x, y, 1000);
+            Log.d(TAG, "Random click: " + x + "-" + y);
+        }
+
+        // start quit
+        Log.d(TAG, "fourPersonQuiz: quit");
+
+        // 等2分钟，足够对手完成了吧
+        for (int i = 0; i < 60; i++) {
+            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "继续挑战");
+            if (node != null) {
+                Log.d(TAG, "终于结束了！");
+                break;
+            } else {
+                Log.d(TAG, "还没结束吗？");
+                CommonUtil.sleep(2000);
+
+            }
+        }
+        CommonUtil.globalBack(accessibilityService, 3000);
+        CommonUtil.globalBack(accessibilityService, 3000);
+    }
+
     private void fourPersonQuiz() {
+        if (!twoPersonQuizEnable) {
+            return;
+        }
 
         TessUtil.init();
         cleanupSnapshotFolder();

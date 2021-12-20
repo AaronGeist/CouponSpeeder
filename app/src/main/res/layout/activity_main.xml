@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,9 +17,94 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#4DF0E23E"
             android:orientation="vertical"
             android:padding="10dp">
+
+
+            <Switch
+                android:id="@+id/switchArticle"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="读文章"
+                android:textSize="16sp"
+                tools:checked="true" />
+
+            <Switch
+                android:id="@+id/switchVideo"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:text="看视频"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switchTV"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:text="本地电视"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switchSingleQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:text="挑战答题"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switchTwoPersonQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:text="双人对战"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switchFourPersonQuiz"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:text="四人对战"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <Button
+                android:id="@+id/setting_btn"
+                android:layout_width="170dp"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                android:background="#4CAF50"
+                android:text="授权"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp" />
+
+            <Button
+                android:id="@+id/start_party_btn"
+                android:layout_width="170dp"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                android:background="#8BC34A"
+                android:text="启动"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border"
+            android:padding="5dp"
+            android:layout_margin="3dp"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -101,46 +186,6 @@
                     tools:layout_editor_absoluteY="284dp" />
             </LinearLayout>
 
-            <Switch
-                android:id="@+id/switchArticle"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="读文章"
-                android:textSize="16sp"
-                tools:checked="true" />
-
-            <Switch
-                android:id="@+id/switchVideo"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:checked="true"
-                android:textSize="16sp"
-                android:text="看视频" />
-
-            <Switch
-                android:id="@+id/switchTV"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:checked="true"
-                android:textSize="16sp"
-                android:text="本地电视" />
-
-            <Switch
-                android:id="@+id/switchSingleQuiz"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:checked="true"
-                android:textSize="16sp"
-                android:text="挑战答题" />
-
-            <Switch
-                android:id="@+id/switchTwoPersonQuiz"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:checked="true"
-                android:textSize="16sp"
-                android:text="双人对战" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -192,7 +237,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dp"
-                    android:background="#FF5722"
+                    android:background="#00BCD4"
                     android:text="保存"
                     android:textColor="@android:color/white"
                     tools:layout_editor_absoluteX="301dp"
@@ -203,44 +248,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="3dp"
-                    android:background="#009688"
+                    android:background="#717171"
                     android:text="恢复默认值"
                     android:textColor="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F4FF81"
-            android:orientation="horizontal"
-            android:padding="10dp">
-
-            <Button
-                android:id="@+id/setting_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="#80D8FF"
-                android:text="授权"
-                android:textSize="17dp" />
-
-            <Button
-                android:id="@+id/start_party_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="#B9F6CA"
-                android:text="学习强国"
-                android:textSize="17dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFF59D"
             android:orientation="horizontal">
 
             <TextView
@@ -258,11 +274,12 @@
 
             <Button
                 android:id="@+id/clean_btn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="3dp"
-                android:background="#EE00B0FF"
-                android:text="清理" />
+                android:background="#787878"
+                android:text="清理"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
 

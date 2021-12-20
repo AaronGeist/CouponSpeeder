@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Switch swTV;
     private Switch swSingleQuiz;
     private Switch swTwoPersonQuiz;
+    private Switch swFourPersonQuiz;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +108,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swTV = findViewById(R.id.switchTV);
         swSingleQuiz = findViewById(R.id.switchSingleQuiz);
         swTwoPersonQuiz = findViewById(R.id.switchTwoPersonQuiz);
+        swFourPersonQuiz = findViewById(R.id.switchFourPersonQuiz);
+
+        swArticle.setOnClickListener(this);
+        swVideo.setOnClickListener(this);
+        swTV.setOnClickListener(this);
+        swSingleQuiz.setOnClickListener(this);
+        swTwoPersonQuiz.setOnClickListener(this);
+        swFourPersonQuiz.setOnClickListener(this);
 
         btnSettings.setOnClickListener(this);
         btnSave.setOnClickListener(this);
@@ -127,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 swTV.setChecked(true);
                 swSingleQuiz.setChecked(true);
                 swTwoPersonQuiz.setChecked(true);
+                swFourPersonQuiz.setChecked(true);
 
                 tvKeepTitleNum.setText("1");
                 tvAlipayCmbToken.setText("aaa");
@@ -142,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 swTV.setChecked(jsonObject.getBoolean("enable_tv"));
                 swSingleQuiz.setChecked(jsonObject.getBoolean("enable_single_quiz"));
                 swTwoPersonQuiz.setChecked(jsonObject.getBoolean("enable_two_person_quiz"));
+                swFourPersonQuiz.setChecked(jsonObject.getBoolean("enable_four_person_quiz"));
 
                 tvKeepTitleNum.setText(String.valueOf(HistoryRecord.readData().size()));
                 tvAlipayCmbToken.setText(jsonObject.getString("alipay_cmb_token"));
@@ -163,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("enable_tv", swTV.isChecked());
         intent.putExtra("enable_single_quiz", swSingleQuiz.isChecked());
         intent.putExtra("enable_two_person_quiz", swTwoPersonQuiz.isChecked());
+        intent.putExtra("enable_four_person_quiz", swFourPersonQuiz.isChecked());
+
         intent.putExtra("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
         intent.putExtra("password", tvPassword.getText().toString());
 
@@ -180,6 +194,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity("cn.xuexi.android", "com.alibaba.android.rimet.biz.SplashActivity");
                 break;
             case R.id.saveBtn:
+            case R.id.switchArticle:
+            case R.id.switchVideo:
+            case R.id.switchTV:
+            case R.id.switchSingleQuiz:
+            case R.id.switchTwoPersonQuiz:
+            case R.id.switchFourPersonQuiz:
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
@@ -191,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("enable_tv", swTV.isChecked());
                     jsonObject.put("enable_single_quiz", swSingleQuiz.isChecked());
                     jsonObject.put("enable_two_person_quiz", swTwoPersonQuiz.isChecked());
+                    jsonObject.put("enable_four_person_quiz", swFourPersonQuiz.isChecked());
+
                     jsonObject.put("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
                     jsonObject.put("password", tvPassword.getText().toString());
 
@@ -213,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 swTV.setChecked(true);
                 swSingleQuiz.setChecked(true);
                 swTwoPersonQuiz.setChecked(true);
+                swFourPersonQuiz.setChecked(true);
                 break;
             case R.id.clean_btn:
                 if (tvKeepTitleNum.getText() != null && !tvKeepTitleNum.getText().toString().equals("")) {
