@@ -20,13 +20,13 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-
             <Switch
                 android:id="@+id/switchArticle"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:text="读文章"
-                android:textSize="16sp"
+                android:drawableLeft="@drawable/fox"
+                android:textSize="20sp"
                 tools:checked="true" />
 
             <Switch
@@ -35,7 +35,8 @@
                 android:layout_height="40dp"
                 android:checked="true"
                 android:text="看视频"
-                android:textSize="16sp" />
+                android:drawableLeft="@drawable/tiger"
+                android:textSize="20sp" />
 
             <Switch
                 android:id="@+id/switchTV"
@@ -43,7 +44,8 @@
                 android:layout_height="40dp"
                 android:checked="true"
                 android:text="本地电视"
-                android:textSize="16sp" />
+                android:drawableLeft="@drawable/elephant"
+                android:textSize="20sp" />
 
             <Switch
                 android:id="@+id/switchSingleQuiz"
@@ -51,7 +53,8 @@
                 android:layout_height="40dp"
                 android:checked="true"
                 android:text="挑战答题"
-                android:textSize="16sp" />
+                android:drawableLeft="@drawable/giraffle"
+                android:textSize="20sp" />
 
             <Switch
                 android:id="@+id/switchTwoPersonQuiz"
@@ -59,7 +62,8 @@
                 android:layout_height="40dp"
                 android:checked="true"
                 android:text="双人对战"
-                android:textSize="16sp" />
+                android:drawableLeft="@drawable/monkey"
+                android:textSize="20sp" />
 
             <Switch
                 android:id="@+id/switchFourPersonQuiz"
@@ -67,7 +71,8 @@
                 android:layout_height="40dp"
                 android:checked="true"
                 android:text="四人对战"
-                android:textSize="16sp" />
+                android:drawableLeft="@drawable/bee"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -82,8 +87,10 @@
                 android:layout_height="100dp"
                 android:layout_margin="10dp"
                 android:background="#4CAF50"
+                android:drawableLeft="@drawable/lion"
                 android:text="授权"
                 android:textColor="#FFFFFF"
+                android:drawablePadding="-30dp"
                 android:textSize="40sp" />
 
             <Button
@@ -92,8 +99,10 @@
                 android:layout_height="100dp"
                 android:layout_margin="10dp"
                 android:background="#8BC34A"
+                android:drawableLeft="@drawable/pig"
                 android:text="启动"
                 android:textColor="#FFFFFF"
+                android:drawablePadding="-30dp"
                 android:textSize="40sp" />
 
         </LinearLayout>
