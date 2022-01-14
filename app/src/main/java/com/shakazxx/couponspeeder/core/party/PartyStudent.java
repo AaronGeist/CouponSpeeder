@@ -66,7 +66,7 @@ public class PartyStudent {
         String date = new SimpleDateFormat("yyyy").format(new Date());
         if (articleReader.findEntrance("工作")) {
             if (articleReader.findEntrance("推荐")) {
-                articleReader.processSingle(date);
+                articleReader.processSingle(date.substring(0, 3));
             }
         }
     }
@@ -93,7 +93,7 @@ public class PartyStudent {
         String date = new SimpleDateFormat("yyyy").format(calendar.getTime());
         if (videoReader.findEntrance("电视台")) {
             if (videoReader.findEntrance("第一频道")) {
-                videoReader.processSingle(date);
+                videoReader.processSingle(date.substring(0, 3));
             }
         }
     }
