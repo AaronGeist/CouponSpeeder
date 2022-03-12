@@ -66,7 +66,7 @@ public class VideoReader extends BaseLearner {
             Log.d(TAG, "快进！");
             GestureUtil.click(accessibilityService, getWidth() / 2, 300, 500);
             // 直接点到最后
-            GestureUtil.click(accessibilityService, getWidth() - 270, 675, 500);
+            GestureUtil.click(accessibilityService, getWidth() - 270, 650, 500);
 
             // 2秒检测一次，等待自动放完，最多等60秒
             int waitCnt = 0;

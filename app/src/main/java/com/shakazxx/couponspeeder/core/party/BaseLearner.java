@@ -164,9 +164,6 @@ public abstract class BaseLearner extends BaseAction {
                     readTitles.add(title);
                     Log.d(TAG, ">>>>>>>>> 发现新内容：" + title + " >>>>>>>>>>>>>");
 
-                    if (title.contains("盗墓笔记")) {
-                        continue;
-                    }
                     if (CommonUtil.click(btn, 1000)) {
                         if (processEntry(title)) {
                             // 记录数据
@@ -216,6 +213,10 @@ public abstract class BaseLearner extends BaseAction {
 
     public void stop() {
         this.pending = true;
+    }
+
+    public void disable() {
+        this.enable = false;
     }
 
     // 进入单项后如何处理

@@ -122,18 +122,9 @@ public class Quiz extends BaseLearner {
         }
         CommonUtil.globalBack(accessibilityService, 3000);
 
-
-        for (int i = 0; i < 10; i++) {
-            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "随机匹配");
-            if (node != null) {
-                Log.d(TAG, "回到匹配界面");
-                break;
-            } else {
-                CommonUtil.sleep(1000);
-            }
-        }
-        CommonUtil.globalBack(accessibilityService, 3000);
-        GestureUtil.click(accessibilityService, 300, getHeight() / 2 + 100, 1000); // click quit button
+        // 这里开始都找不到text，只能按位置点
+        CommonUtil.globalBack(accessibilityService, 1000);
+        GestureUtil.click(accessibilityService, 300, getHeight() / 2 + 200, 1000); // click quit button
     }
 
     private void twoPersonQuiz() {
@@ -247,7 +238,15 @@ public class Quiz extends BaseLearner {
 
         // go to inner page and start
         GestureUtil.click(accessibilityService, 300, getHeight() - 800, 1000);
-        GestureUtil.click(accessibilityService, 300, getHeight() - 300, 13000);
+        for (int i = 0; i < 10; i++) {
+            AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "开始比赛");
+            if (node != null) {
+                CommonUtil.click(node, 13000);
+                break;
+            } else {
+                CommonUtil.sleep(1000);
+            }
+        }
 
         Random r = new Random();
         for (int i = 0; i < 20; i++) {
