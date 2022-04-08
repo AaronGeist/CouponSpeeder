@@ -1,11 +1,11 @@
 package com.shakazxx.couponspeeder.core.party;
 
+import static java.lang.Thread.sleep;
+
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import com.shakazxx.couponspeeder.core.util.FileUtil;
-import com.shakazxx.couponspeeder.core.util.TessUtil;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,17 +13,21 @@ import java.util.Date;
 
 public class PartyStudent {
 
-    private ArticleReader articleReader;
-    private VideoReader videoReader;
-    private LocalChannel localChannel;
-    private Quiz quiz;
-    private Subscription subscription;
-    private Login login;
-    private ScoreReader scoreReader;
+    private final ArticleReader articleReader;
+    private final VideoReader videoReader;
+    private final LocalChannel localChannel;
+    private final Quiz quiz;
+    private final Subscription subscription;
+    private final Login login;
+    private final ScoreReader scoreReader;
+    private final Bundle bundle;
+    private boolean enable = true;
+
+    private final static int MAX_RETRY_TIMES = 5;
 
     public PartyStudent(AccessibilityService service, Bundle bundle) {
+        this.bundle = bundle;
         login = new Login(service);
-
         articleReader = new ArticleReader(service, bundle);
         videoReader = new VideoReader(service, bundle);
         localChannel = new LocalChannel(service, bundle);
@@ -33,15 +37,41 @@ public class PartyStudent {
     }
 
     public void learn() {
-        login();
+        if (!enable) {
+            return;
+        }
 
-//        getScore();
+        if (!login()) {
+            return;
+        }
 
-        readArticle();
-        watchVideo();
-        localChannel();
-        challengeQuiz();
-        // subscribe();
+        // 如果分数不够，重新增量执行
+        for (int i = 0; i < MAX_RETRY_TIMES; i++) {
+            // wait until score is loaded
+            while (!getScore()) {
+                try {
+                    sleep(2000);
+                    Log.d(this.getClass().getSimpleName(), "Wait for score");
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+            if (bundle.getBoolean(ScoreReader.ALL_DONE_KEY)) {
+                Log.d(this.getClass().getSimpleName(), "Congratulations! Mission completed!");
+                enable = false;
+                return;
+            }
+
+            readArticle();
+            watchVideo();
+            localChannel();
+            challengeQuiz();
+            // subscribe();
+        }
+
+        // fail to complete mission, send message
+
     }
 
     public void stop() {
@@ -51,19 +81,23 @@ public class PartyStudent {
         quiz.stop();
     }
 
-    private void login() {
-        login.process();
+    private boolean login() {
+        return login.process();
     }
 
-    private void getScore() {
+    private boolean getScore() {
         if (scoreReader.findEntrance("我的")) {
             if (scoreReader.findEntrance("学习积分")) {
                 scoreReader.processSingle("");
+                return true;
             }
         }
+        return false;
     }
 
     private void readArticle() {
+        articleReader.loadConfiguration();
+
         @SuppressLint("SimpleDateFormat")
         String date = new SimpleDateFormat("yyyy").format(new Date());
         if (articleReader.findEntrance("工作")) {
@@ -74,6 +108,7 @@ public class PartyStudent {
     }
 
     private void challengeQuiz() {
+        quiz.loadConfiguration();
         if (quiz.findEntrance("我的")) {
             if (quiz.findEntrance("我要答题")) {
                 quiz.processSingle("");
@@ -82,6 +117,7 @@ public class PartyStudent {
     }
 
     private void subscribe() {
+        subscription.loadConfiguration();
         if (subscription.findEntrance("我的")) {
             if (subscription.findEntrance("订阅")) {
                 subscription.processSingle("");
@@ -90,6 +126,7 @@ public class PartyStudent {
     }
 
     private void watchVideo() {
+        videoReader.loadConfiguration();
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat")
         String date = new SimpleDateFormat("yyyy").format(calendar.getTime());
@@ -101,6 +138,7 @@ public class PartyStudent {
     }
 
     private void localChannel() {
+        localChannel.loadConfiguration();
         if (localChannel.findEntrance("工作")) {
             if (localChannel.findEntrance("上海")) {
                 localChannel.processSingle("");

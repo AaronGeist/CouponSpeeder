@@ -9,11 +9,13 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.Score.CmbScoreFetcher;
 import com.shakazxx.couponspeeder.core.Score.SpdccScoreFetcher;
 import com.shakazxx.couponspeeder.core.alipay.AlipayScore;
 import com.shakazxx.couponspeeder.core.party.PartyStudent;
+import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.wechat.WechatScore;
 
 import java.util.List;
@@ -88,6 +90,15 @@ public class MyAccessibilityService extends AccessibilityService {
             case TYPE_WINDOW_STATE_CHANGED:
                 if (packageName.equalsIgnoreCase("cn.xuexi.android")) {
                     partyStudent.learn();
+                    return;
+                }
+
+                if (packageName.equalsIgnoreCase("com.android.systemui") && className.equalsIgnoreCase("android.widget.FrameLayout")) {
+                    AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(this, null, "取消");
+                    if (node != null && node.isClickable()) {
+                        CommonUtil.click(node, 100);
+                    }
+
                     return;
                 }
 

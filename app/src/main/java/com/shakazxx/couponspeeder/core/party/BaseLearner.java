@@ -44,6 +44,7 @@ public abstract class BaseLearner extends BaseAction {
     public BaseLearner(AccessibilityService service, Bundle bundle) {
         super(service);
         this.bundle = bundle;
+        loadConfiguration();
     }
 
     public boolean findEntrance(String keyword) {
@@ -122,7 +123,7 @@ public abstract class BaseLearner extends BaseAction {
                     // 屏幕外的部分不要
                     Rect rect = new Rect();
                     entry.getBoundsInScreen(rect);
-                    if (rect.left < 0 || rect.right < 0) {
+                    if (rect.left < 0 || rect.right < 0 || rect.left > rect.right) {
                         continue;
                     }
 
@@ -218,6 +219,9 @@ public abstract class BaseLearner extends BaseAction {
     public void disable() {
         this.enable = false;
     }
+
+    // 从 bundle 加载配置
+    abstract void loadConfiguration();
 
     // 进入单项后如何处理
     abstract boolean processEntry(String title);

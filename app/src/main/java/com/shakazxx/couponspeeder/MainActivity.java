@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.shakazxx.couponspeeder.core.party.ArticleReader;
+import com.shakazxx.couponspeeder.core.party.ConfigEnum;
 import com.shakazxx.couponspeeder.core.party.HistoryRecord;
 import com.shakazxx.couponspeeder.core.party.VideoReader;
 import com.shakazxx.couponspeeder.core.util.FileUtil;
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvArticleNum.setText(jsonObject.getString("article_num"));
                 tvArticleTime.setText(jsonObject.getString("article_time"));
                 tvVideoNum.setText(jsonObject.getString("video_num"));
-                tvVideoTime.setText(jsonObject.getString("video_time"));
+                tvVideoTime.setText(jsonObject.getString("video_minute"));
                 swArticle.setChecked(jsonObject.getBoolean("enable_article"));
                 swVideo.setChecked(jsonObject.getBoolean("enable_video"));
                 swTV.setChecked(jsonObject.getBoolean("enable_tv"));
@@ -169,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
         intent.putExtra("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
         intent.putExtra("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
-        intent.putExtra("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+        intent.putExtra("video_minute", Integer.valueOf(tvVideoTime.getText().toString()));
         intent.putExtra("enable_article", swArticle.isChecked());
         intent.putExtra("enable_video", swVideo.isChecked());
         intent.putExtra("enable_tv", swTV.isChecked());
@@ -179,6 +180,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         intent.putExtra("alipay_cmb_token", tvAlipayCmbToken.getText().toString());
         intent.putExtra("password", tvPassword.getText().toString());
+
+        // if command line parameters are used, use them instead
+        if (this.getIntent() != null) {
+            Bundle bundle = this.getIntent().getExtras();
+            if (bundle != null) {
+                for (ConfigEnum configEnum : ConfigEnum.values()) {
+                    Object value = bundle.get(configEnum.code);
+                    if (value != null) {
+                        switch (configEnum.type) {
+                            case "boolean":
+                                intent.putExtra(configEnum.code, (Boolean) value);
+                                break;
+                            case "int":
+                                intent.putExtra(configEnum.code, (Integer) value);
+                                break;
+                            default:
+                                throw new IllegalArgumentException("ERROR: not supported config enum: " + configEnum.code);
+                        }
+                    }
+                }
+            }
+        }
 
         return intent;
     }
@@ -205,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     jsonObject.put("article_num", Integer.valueOf(tvArticleNum.getText().toString()));
                     jsonObject.put("article_time", Integer.valueOf(tvArticleTime.getText().toString()));
                     jsonObject.put("video_num", Integer.valueOf(tvVideoNum.getText().toString()));
-                    jsonObject.put("video_time", Integer.valueOf(tvVideoTime.getText().toString()));
+                    jsonObject.put("video_minute", Integer.valueOf(tvVideoTime.getText().toString()));
                     jsonObject.put("enable_article", swArticle.isChecked());
                     jsonObject.put("enable_video", swVideo.isChecked());
                     jsonObject.put("enable_tv", swTV.isChecked());
@@ -229,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvArticleNum.setText(String.valueOf(ArticleReader.DEFAULT_READ_ARTICLE_NUM));
                 tvArticleTime.setText(String.valueOf(ArticleReader.DEFAULT_TIME_IN_SECOND));
                 tvVideoNum.setText(String.valueOf(VideoReader.DEFAULT_WATCH_CNT));
-                tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_TIME));
+                tvVideoTime.setText(String.valueOf(VideoReader.DEFAULT_OVERALL_MINUTES));
                 swArticle.setChecked(true);
                 swVideo.setChecked(true);
                 swTV.setChecked(true);

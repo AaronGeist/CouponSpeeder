@@ -45,6 +45,11 @@ public class Subscription extends BaseLearner {
         enable = false;
     }
 
+    @Override
+    void loadConfiguration() {
+
+    }
+
     private void sub(Set<String> subList) {
         findEntrance("添加");
 

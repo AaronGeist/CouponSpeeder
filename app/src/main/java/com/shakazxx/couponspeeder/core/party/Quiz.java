@@ -35,12 +35,6 @@ public class Quiz extends BaseLearner {
 
     public Quiz(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
-
-        singleQuizEnable = bundle.getBoolean("enable_single_quiz", true);
-        twoPersonQuizEnable = bundle.getBoolean("enable_two_person_quiz", true);
-        fourPersonQuizEnable = bundle.getBoolean("enable_four_person_quiz", true);
-
-        enable = singleQuizEnable || twoPersonQuizEnable || fourPersonQuizEnable;
     }
 
     @Override
@@ -60,6 +54,15 @@ public class Quiz extends BaseLearner {
         CommonUtil.globalBack(accessibilityService, 1000);
 
         enable = false;
+    }
+
+    @Override
+    void loadConfiguration() {
+        singleQuizEnable = bundle.getBoolean("enable_single_quiz", true);
+        twoPersonQuizEnable = bundle.getBoolean("enable_two_person_quiz", true);
+        fourPersonQuizEnable = bundle.getBoolean("enable_four_person_quiz", true);
+
+        enable = singleQuizEnable || twoPersonQuizEnable || fourPersonQuizEnable;
     }
 
     private String takeScreenshot() {
@@ -416,6 +419,7 @@ public class Quiz extends BaseLearner {
             if (i == 5) {
                 // choose wrong answer
                 for (String text : allTextNodes.keySet()) {
+                    // TODO 还是会选最长的标题
                     if (text != null && answer != null && !answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
                         answerNode = allTextNodes.get(text);
                         Log.d(TAG, "singleQuiz: choose wrong answer" + text);

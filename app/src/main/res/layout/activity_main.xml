@@ -178,7 +178,7 @@
                     tools:layout_editor_absoluteY="223dp" />
 
                 <TextView
-                    android:id="@+id/video_time"
+                    android:id="@+id/video_minute"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="视频观看总时间"

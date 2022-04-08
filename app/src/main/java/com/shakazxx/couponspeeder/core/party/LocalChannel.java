@@ -10,11 +10,6 @@ public class LocalChannel extends BaseLearner {
 
     public LocalChannel(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
-
-        if (bundle == null) {
-            bundle = new Bundle();
-        }
-        enable = bundle.getBoolean("enable_tv", true);
     }
 
     @Override
@@ -33,6 +28,11 @@ public class LocalChannel extends BaseLearner {
         CommonUtil.globalBack(accessibilityService, 1000);
 
         enable = false;
+    }
+
+    @Override
+    void loadConfiguration() {
+        enable = bundle.getBoolean("enable_tv", true);
     }
 
     @Override

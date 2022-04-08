@@ -22,21 +22,36 @@ public class ArticleReader extends BaseLearner {
     public static final int REQUIRED_COMMENT_CNT = 2; // 评论次数
     public static final int MAX_SCROLL_DOWN_CNT = 30; // 下滑最大次数
 
-    private int articleNum;
-    private int articleTime;
-    private int shareCnt = 0;
-    private int commentCnt = 0;
+    private int trgArticleNum;
+    private int trgShareNum;
+    private int trgCommentNum;
+    private int trgArticleTime;
+
+    private int currShareCnt = 0;
+    private int currCommentCnt = 0;
 
     public ArticleReader(AccessibilityService service, Bundle bundle) {
         super(service, bundle);
+    }
 
-        if (bundle == null) {
-            bundle = new Bundle();
+    @Override
+    void loadConfiguration() {
+        trgArticleNum = bundle.getInt("article_num", DEFAULT_READ_ARTICLE_NUM);
+        enable = bundle.getBoolean("enable_article", true);
+        trgShareNum = bundle.getInt("article_share_num", REQUIRED_SHARE_CNT);
+        trgCommentNum = bundle.getInt("article_comment_num", REQUIRED_COMMENT_CNT);
+
+        if (trgArticleNum == 0) {
+            trgArticleTime = 0;
+        } else {
+            trgArticleTime = DEFAULT_TIME_IN_SECOND;
         }
 
-        articleNum = bundle.getInt("article_num", DEFAULT_READ_ARTICLE_NUM);
-        articleTime = bundle.getInt("article_time", DEFAULT_TIME_IN_SECOND);
-        enable = bundle.getBoolean("enable_article", true);
+        // if any of comment/share/read is not zero, still need to read article
+        trgArticleNum = Math.max(Math.max(trgArticleNum, trgShareNum), trgCommentNum);
+
+        currShareCnt = 0;
+        currCommentCnt = 0;
     }
 
     @Override
@@ -51,7 +66,7 @@ public class ArticleReader extends BaseLearner {
         while (!pending) {
             endTime = System.currentTimeMillis();
             // 累计时间到了，不看了
-            if (endTime - startTime > articleTime * 1000) {
+            if (endTime - startTime > trgArticleTime * 1000) {
                 Log.d(TAG, "阅读时间满足条件");
                 break;
             }
@@ -81,11 +96,11 @@ public class ArticleReader extends BaseLearner {
         List<AccessibilityNodeInfo> elements = CommonUtil.findAllByText(accessibilityService, null, "欢迎发表你的观点");
         if (elements.size() > 0) {
             // 收藏
-            GestureUtil.click(accessibilityService, getWidth() - 200, getHeight() + 50, 1000);
+//            GestureUtil.click(accessibilityService, getWidth() - 200, getHeight() + 50, 1000);
 
             // 分享
-            if (shareCnt < REQUIRED_SHARE_CNT) {
-                shareCnt++;
+            if (currShareCnt < trgShareNum) {
+                currShareCnt++;
                 GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() + 50, 1000);
                 AccessibilityNodeInfo newRoot = accessibilityService.getRootInActiveWindow();
                 if (newRoot == null) {
@@ -98,9 +113,9 @@ public class ArticleReader extends BaseLearner {
                 }
             }
 
-            if (commentCnt < REQUIRED_COMMENT_CNT) {
-                commentCnt++;
-                GestureUtil.click(accessibilityService, 200, getHeight() + 50 , 1000);
+            if (currCommentCnt < trgCommentNum) {
+                currCommentCnt++;
+                GestureUtil.click(accessibilityService, 200, getHeight() + 50, 1000);
                 AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, null, "好观点将会被优先展示");
                 if (node != null) {
                     CommonUtil.inputText(node, CommentDict.pick());
@@ -110,9 +125,10 @@ public class ArticleReader extends BaseLearner {
         }
     }
 
+
     @Override
     int getRequiredEntryCnt() {
-        return articleNum;
+        return trgArticleNum;
     }
 
     @Override
