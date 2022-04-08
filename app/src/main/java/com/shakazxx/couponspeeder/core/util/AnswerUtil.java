@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,7 @@ public class AnswerUtil {
             while (it.hasNext()) {
                 String key = it.next();
                 String value = (String) jsonObject.get(key);
-                key = key.replaceAll("[`\\\\~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%…&*（）——+|{}《》【】‘；：”“’。，、？]", "");
+                key = key.replaceAll("[`\\\\~!@#$%^&*()+={}':;',\\[\\].<>/?~！@#￥%…&*（）——+{}《》【】‘；：”“’。，、？]", "");
                 answers.put(key, value);
                 answerKeys.add(key);
             }
@@ -34,9 +35,7 @@ public class AnswerUtil {
         }
     }
 
-    public String find(List<String> keywords) {
-        String res = null;
-
+    public List<String> find(List<String> keywords) {
         List<String> results= new ArrayList<>(answerKeys);
         for (final String keyword : keywords) {
             List<String> tempRes = results.stream().filter(item -> item.contains(keyword)).collect(Collectors.toList());
@@ -44,12 +43,12 @@ public class AnswerUtil {
                 continue;
             }
             if (tempRes.size() == 1) {
-                return answers.get(tempRes.get(0));
+                return Arrays.asList(tempRes.get(0), answers.get(tempRes.get(0)));
             }
             results = tempRes;
         }
 
-        return res;
+        return null;
     }
 }
 

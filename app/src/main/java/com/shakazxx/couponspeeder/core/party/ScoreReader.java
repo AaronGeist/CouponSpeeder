@@ -7,9 +7,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,6 +140,17 @@ public class ScoreReader extends BaseLearner {
                     }
                 }
             }
+        }
+
+        // 直接跳过读文章
+        if (bundle.getInt("article_num") == 0) {
+            bundle.putBoolean("enable_article", false);
+        }
+
+        // 直接跳过看视频
+        if (bundle.getInt("video_num") == 0 && bundle.getInt("video_minute") == 0) {
+            bundle.putBoolean("enable_video", false);
+
         }
 
         bundle.putBoolean(ALL_DONE_KEY, isAllDone);

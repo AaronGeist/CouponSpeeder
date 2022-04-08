@@ -179,12 +179,14 @@ public class Quiz extends BaseLearner {
             for (String kw : keywords) {
                 Log.d(TAG, "keyword: " + kw);
             }
-            String answer = answerUtil.find(keywords);
-            Log.d(TAG, "answer: " + answer);
+            List<String> answerData = answerUtil.find(keywords);
 
             AccessibilityNodeInfo answerNode = null;
 
-            if (answer != null) {
+            if (answerData != null) {
+                String answer = answerData.get(1);
+                Log.d(TAG, "answer: " + answer);
+
                 List<String> texts = allTextNodes.keySet().stream().filter(key -> key.contains(answer)).collect(Collectors.toList());
                 for (String text : texts) {
                     answerNode = allTextNodes.get(text);
@@ -319,8 +321,11 @@ public class Quiz extends BaseLearner {
             for (String kw : keywords) {
                 Log.d(TAG, "keyword: " + kw);
             }
-            String answer = answerUtil.find(keywords);
-            Log.d(TAG, "answer: " + answer);
+            String answer = null;
+            List<String> answerData = answerUtil.find(keywords);
+            if (answerData != null) {
+                answer = answerData.get(1);
+            }
 
             Rect rect = null;
             if (answer != null) {
@@ -412,34 +417,53 @@ public class Quiz extends BaseLearner {
             for (String kw : keywords) {
                 Log.d(TAG, "keyword: " + kw);
             }
-            String answer = answerUtil.find(keywords);
-            Log.d(TAG, "answer: " + answer);
+
+            List<String> answerData = answerUtil.find(keywords);
 
             AccessibilityNodeInfo answerNode = null;
-            if (i == 5) {
-                // choose wrong answer
-                for (String text : allTextNodes.keySet()) {
-                    // TODO 还是会选最长的标题
-                    if (text != null && answer != null && !answer.equals(text) && !"\uE6F8".equals(text) && !text.contains("出题") && !text.contains("推荐") && !text.equals("")) {
-                        answerNode = allTextNodes.get(text);
-                        Log.d(TAG, "singleQuiz: choose wrong answer" + text);
-                        break;
-                    }
+
+            if (answerData != null) {
+                String question = answerData.get(0);
+                String answer = answerData.get(1);
+                Log.d(TAG, "answer: " + answer);
+
+                // 找到答案了
+                if (i < 5) {
+                    // 选一个正确的
+                    answerNode = allTextNodes.get(answer);
+                } else {
+                    // 选一个错误的
+                    List<String> questions = new ArrayList<>(Arrays.asList(question.split("\\|")));
+                    questions.remove(0);
+                    questions.remove(answer);
+                    String wrongAnswer = questions.get(0);
+                    Log.d(TAG, "wrong answer: " + answer);
+                    answerNode = allTextNodes.get(wrongAnswer);
+                }
+
+                if (answerNode != null) {
+                    CommonUtil.click(answerNode, 100);
+                    CommonUtil.sleep(2000);
+                } else {
+                    // Cannot find answer, maybe there's no answer for current quiz, might need to retry
+                    Log.d(TAG, "singleQuiz: cannot find answer, quit and retry");
+                    // quit
+                    CommonUtil.globalBack(accessibilityService, 1000);
+                    CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
+                    return false;
                 }
             } else {
-                answerNode = allTextNodes.get(answer);
-            }
-
-            if (answerNode != null) {
-                CommonUtil.click(answerNode, 100);
-                CommonUtil.sleep(2000);
-            } else {
-                // Cannot find answer, maybe there's no answer for current quiz, might need to retry
-                Log.d(TAG, "singleQuiz: cannot find answer, quit and retry");
-                // quit
-                CommonUtil.globalBack(accessibilityService, 1000);
-                CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
-                return false;
+                // 没找到答案
+                if (i < 5) {
+                    // 退出重来
+                    Log.d(TAG, "singleQuiz: cannot find answer, quit and retry");
+                    // quit
+                    CommonUtil.globalBack(accessibilityService, 1000);
+                    CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, null, "退出"), 1000);
+                    return false;
+                } else {
+                    // 等时间结束
+                }
             }
         }
 
