@@ -12,6 +12,8 @@ public enum ConfigEnum {
     enable_single_quiz("enable_single_quiz", "boolean"),
     enable_two_person_quiz("enable_two_person_quiz", "boolean"),
     enable_four_person_quiz("enable_four_person_quiz", "boolean"),
+    covid9_report("covid9_report", "boolean"),
+    party_report("party_report", "boolean"),
     ;
 
     public String code;

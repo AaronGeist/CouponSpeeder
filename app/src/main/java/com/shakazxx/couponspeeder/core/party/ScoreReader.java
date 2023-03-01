@@ -1,5 +1,7 @@
 package com.shakazxx.couponspeeder.core.party;
 
+import static com.shakazxx.couponspeeder.core.util.CommonUtil.sleep;
+
 import android.accessibilityservice.AccessibilityService;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,8 +11,6 @@ import com.shakazxx.couponspeeder.core.util.CommonUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ScoreReader extends BaseLearner {
 
@@ -22,6 +22,8 @@ public class ScoreReader extends BaseLearner {
     private static final String MAX_NUM = "maxNum";
 
     Map<String, Map<String, Object>> scoreConfig = new HashMap<>();
+
+    String logs = "";
 
     // constructor
     public ScoreReader(AccessibilityService service, Bundle bundle) {
@@ -55,7 +57,7 @@ public class ScoreReader extends BaseLearner {
         scoreConfig.put("视听学习时长", innerConfig);
 
         innerConfig = new HashMap<>();
-        innerConfig.put(TRG_SCORE, 6);
+        innerConfig.put(TRG_SCORE, 5);
         innerConfig.put(BUNDLE_KEY, "enable_single_quiz");
         innerConfig.put(TYPE, "toggle");
         scoreConfig.put("挑战答题", innerConfig);
@@ -98,46 +100,55 @@ public class ScoreReader extends BaseLearner {
 
     @Override
     public void processSingle(String keyword) {
-        Pattern pattern = Pattern.compile("已获([0-9]{1,2})分/每日上限([0-9]{1,2})分");
+        logs = "";
+        int cnt = 0;
+        AccessibilityNodeInfo rootNode = null;
+        for (int i = 0; i < 10; i++) {
+            rootNode = CommonUtil.findFirstNodeByText(accessibilityService, "积分规则", 30000, 1000).getParent().getChild(2);
+            cnt = rootNode.getChildCount();
 
-        AccessibilityNodeInfo rootNode = CommonUtil.findFirstNodeByText(accessibilityService, "积分规则", 30000, 1000).getParent().getChild(2);
-        int cnt = rootNode.getChildCount();
+            // 没有加载到，等待
+            if (cnt == 0) {
+                Log.d(TAG, "等待积分加载");
+                sleep(1000);
+            } else {
+                break;
+            }
+        }
         boolean isAllDone = true;
         for (int i = 0; i < cnt; i++) {
-            String type = (String) rootNode.getChild(i).getChild(0).getChild(0).getText();
-            String text = (String) rootNode.getChild(i).getChild(2).getText();
-            if (text != null) {
-                Matcher m = pattern.matcher(text);
-                if (m.matches()) {
-                    int currScore = Integer.valueOf(m.group(1));
-                    if (scoreConfig.containsKey(type)) {
-                        Map<String, Object> settings = scoreConfig.get(type);
-                        int trgScore = (int) settings.get(TRG_SCORE);
-                        boolean isReachTargetScore = currScore >= trgScore;
-                        Log.d(TAG, String.format("%s达标: %s [%d/%d]", (isReachTargetScore ? "已" : "未"), type, currScore, trgScore));
+            String type = (String) rootNode.getChild(i).getChild(0).getText();
+            int currScore = Integer.valueOf((String) rootNode.getChild(i).getChild(3).getChild(0).getText());
 
-                        if ("number".equalsIgnoreCase((String) settings.get(TYPE))) {
-                            // 分值类
-                            String bundleKey = (String) settings.get(BUNDLE_KEY);
-                            if (isReachTargetScore) {
-                                bundle.putInt(bundleKey, 0);
-                            } else if (bundle.containsKey(bundleKey)) {
-                                if (settings.containsKey(MAX_NUM)) {
-                                    bundle.putInt(bundleKey, Math.min((Integer) settings.get(MAX_NUM), trgScore - currScore));
-                                } else {
-                                    // 使用默认值
-                                    bundle.remove(bundleKey);
-                                }
-                            }
+            if (scoreConfig.containsKey(type)) {
+                Map<String, Object> settings = scoreConfig.get(type);
+                int trgScore = (int) settings.get(TRG_SCORE);
+                boolean isReachTargetScore = currScore >= trgScore;
+                String log = String.format("%s达标: %s [%d/%d]", (isReachTargetScore ? "已" : "未"), type, currScore, trgScore);
+                Log.d(TAG, log);
+
+                logs += log + "\n";
+
+                if ("number".equalsIgnoreCase((String) settings.get(TYPE))) {
+                    // 分值类
+                    String bundleKey = (String) settings.get(BUNDLE_KEY);
+                    if (isReachTargetScore) {
+                        bundle.putInt(bundleKey, 0);
+                    } else if (bundle.containsKey(bundleKey)) {
+                        if (settings.containsKey(MAX_NUM)) {
+                            bundle.putInt(bundleKey, Math.min((Integer) settings.get(MAX_NUM), trgScore - currScore));
                         } else {
-                            // 开关类
-                            bundle.putBoolean((String) settings.get(BUNDLE_KEY), !isReachTargetScore);
-                        }
-
-                        if (!isReachTargetScore) {
-                            isAllDone = false;
+                            // 使用默认值
+                            bundle.remove(bundleKey);
                         }
                     }
+                } else {
+                    // 开关类
+                    bundle.putBoolean((String) settings.get(BUNDLE_KEY), !isReachTargetScore);
+                }
+
+                if (!isReachTargetScore) {
+                    isAllDone = false;
                 }
             }
         }
@@ -159,6 +170,10 @@ public class ScoreReader extends BaseLearner {
         // go back to home page
         CommonUtil.globalBack(accessibilityService, 1000);
         CommonUtil.globalBack(accessibilityService, 1000);
+    }
+
+    public String printLog() {
+        return logs;
     }
 
     @Override

@@ -22,8 +22,10 @@ public class PartyStudent {
     private final ScoreReader scoreReader;
     private final Bundle bundle;
     private boolean enable = true;
+    private boolean isAllDone = false;
+    private String resultLog = "";
 
-    private final static int MAX_RETRY_TIMES = 5;
+    private final static int MAX_RETRY_TIMES = 10;
 
     public PartyStudent(AccessibilityService service, Bundle bundle) {
         this.bundle = bundle;
@@ -60,6 +62,7 @@ public class PartyStudent {
             if (bundle.getBoolean(ScoreReader.ALL_DONE_KEY)) {
                 Log.d(this.getClass().getSimpleName(), "Congratulations! Mission completed!");
                 enable = false;
+                isAllDone = true;
                 return;
             }
 
@@ -71,7 +74,7 @@ public class PartyStudent {
         }
 
         // fail to complete mission, send message
-
+        return;
     }
 
     public void stop() {
@@ -81,14 +84,23 @@ public class PartyStudent {
         quiz.stop();
     }
 
+    public boolean isAllDone() {
+        return isAllDone;
+    }
+
+    public String getResultLog() {
+        return resultLog;
+    }
+
     private boolean login() {
         return login.process();
     }
 
     private boolean getScore() {
         if (scoreReader.findEntrance("我的")) {
-            if (scoreReader.findEntrance("学习积分")) {
+            if (scoreReader.findEntrance("学习积分", 220, 800)) {
                 scoreReader.processSingle("");
+                resultLog = scoreReader.printLog();
                 return true;
             }
         }
@@ -110,7 +122,7 @@ public class PartyStudent {
     private void challengeQuiz() {
         quiz.loadConfiguration();
         if (quiz.findEntrance("我的")) {
-            if (quiz.findEntrance("我要答题")) {
+            if (quiz.findEntrance("我要答题", 550, 800)) {
                 quiz.processSingle("");
             }
         }
@@ -127,6 +139,7 @@ public class PartyStudent {
 
     private void watchVideo() {
         videoReader.loadConfiguration();
+
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat")
         String date = new SimpleDateFormat("yyyy").format(calendar.getTime());

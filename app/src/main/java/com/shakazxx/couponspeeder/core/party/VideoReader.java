@@ -13,7 +13,7 @@ public class VideoReader extends BaseLearner {
 
     private final String TAG = getClass().getSimpleName();
 
-    public static final int DEFAULT_WATCH_CNT = 8;
+    public static final int DEFAULT_WATCH_CNT = 6;
     public static final int DEFAULT_OVERALL_MINUTES = 6;
 
     private int videoReadTimeInSecondsLeft;  //视频观看秒数  180
@@ -30,9 +30,10 @@ public class VideoReader extends BaseLearner {
     void loadConfiguration() {
         trgVideoNum = bundle.getInt("video_num", DEFAULT_WATCH_CNT);
         trgVideoMin = bundle.getInt("video_minute", DEFAULT_OVERALL_MINUTES);
-        videoReadTimeInSecondsLeft = trgVideoMin * 60;
+        videoReadTimeInSecondsLeft = trgVideoMin * 80; // 额外多看一些时间
 
         enable = bundle.getBoolean("enable_video", true);
+        Log.d(TAG, String.format("trgVideoNum %s\ntrgVideoMin %s\nvideoReadTimeInSecondsLeft %s\nenable %s", trgVideoNum, trgVideoMin, videoReadTimeInSecondsLeft, enable));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class VideoReader extends BaseLearner {
                 Log.d(TAG, "快进！round " + (round + 1));
                 GestureUtil.click(accessibilityService, getWidth() / 2, 300, 500);
                 // 直接点到最后
-                GestureUtil.click(accessibilityService, getWidth() - 270 - round * step, 650, 500);
+                GestureUtil.click(accessibilityService, 690 - round * step, 630, 500);
 
                 // 2秒检测一次，等待自动放完，最多等60秒
                 while (!pending && waitCnt <= MAX_WAIT_CNT) {

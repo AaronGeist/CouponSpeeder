@@ -85,7 +85,7 @@ public class CommonUtil {
         return nodes.get(0);
     }
 
-    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityService service, AccessibilityNodeInfo root, String nodeClassName, String text) {
+    public static AccessibilityNodeInfo findFirstNodeByClassName(AccessibilityService service, AccessibilityNodeInfo root, String nodeClassName) {
         if (root == null) {
             root = service.getRootInActiveWindow();
         }
@@ -94,13 +94,13 @@ public class CommonUtil {
             return null;
         }
 
-        if (root.getClassName().toString().equalsIgnoreCase(nodeClassName) && root.getContentDescription() != null && root.getContentDescription().toString().contains(text)) {
+        if (root.getClassName().toString().equalsIgnoreCase(nodeClassName)) {
             return root;
         }
 
         int maxIndex = root.getChildCount();
         for (int i = 0; i < maxIndex; i++) {
-            AccessibilityNodeInfo node = findFirstNodeByClassName(service, root.getChild(i), nodeClassName, text);
+            AccessibilityNodeInfo node = findFirstNodeByClassName(service, root.getChild(i), nodeClassName);
             if (node != null)
                 return node;
         }

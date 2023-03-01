@@ -369,12 +369,20 @@ public class Quiz extends BaseLearner {
     }
 
     private void singleQuiz() {
+        if (!singleQuizEnable) {
+            return;
+        }
+
+        GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 300, 5000);
+
         // enable retry
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 40; i++) {
             if (doSingleQuiz()) {
                 break;
             }
         }
+
+        CommonUtil.globalBack(accessibilityService, 1000);
     }
 
     private boolean doSingleQuiz() {
@@ -382,12 +390,13 @@ public class Quiz extends BaseLearner {
             return true;
         }
 
-        GestureUtil.click(accessibilityService, getWidth() - 100, getHeight() - 300, 5000);
+        // 进入一个总题库
+        GestureUtil.click(accessibilityService, getWidth() / 2, 360, 5000);
 
         // retry to avoid entering page too fast
         for (int j = 0; j < 10; j++) {
             Map<String, AccessibilityNodeInfo> allTextNodes = CommonUtil.findAllText(accessibilityService, null);
-            if (allTextNodes.size() > 0) {
+            if (allTextNodes != null &&  allTextNodes.size() > 0) {
                 break;
             } else {
                 CommonUtil.sleep(1000);
@@ -399,20 +408,18 @@ public class Quiz extends BaseLearner {
             Map<String, AccessibilityNodeInfo> allTextNodes = null;
 
             for (int j = 0; j < 10; j++) {
-                Log.d(TAG, "singleQuiz: try " + j + " time");
+                Log.d(TAG, "singleQuiz: try find new quiz, tried " + j + " time now");
                 CommonUtil.sleep(1000);
                 allTextNodes = CommonUtil.findAllText(accessibilityService, null);
                 String question = CommonUtil.getLongest(new ArrayList<>(allTextNodes.keySet()));
                 if (!question.equals(lastQuestion)) {
-                    Log.d(TAG, "singleQuiz: new quiz " + question);
+                    Log.d(TAG, "singleQuiz: find new quiz, question=" + question);
                     lastQuestion = question;
                     break;
                 }
             }
 
-            Log.d(TAG, ">>>>>>>> findText: " + allTextNodes.size());
-
-            List<String> keywords = new ArrayList<>(allTextNodes.keySet()).stream().map(item -> item.replaceAll("[`\\\\~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%…&*（）——+|{}《》【】‘；：”“’。，、？]", "")).filter(item -> item.length() > 1).collect(Collectors.toList());
+            List<String> keywords = new ArrayList<>(allTextNodes.keySet()).stream().map(item -> item.replaceAll("[\\s`\\\\~!@#$%^&*()+={}':;,\\[\\].<>/?！￥…（）—《》【】‘；：”“’。，、？]", "")).filter(item -> item.length() >= 1).collect(Collectors.toList());
 
             for (String kw : keywords) {
                 Log.d(TAG, "keyword: " + kw);
@@ -437,7 +444,7 @@ public class Quiz extends BaseLearner {
                     questions.remove(0);
                     questions.remove(answer);
                     String wrongAnswer = questions.get(0);
-                    Log.d(TAG, "wrong answer: " + answer);
+                    Log.d(TAG, "now 6th round, choose a wrong answer: " + answer);
                     answerNode = allTextNodes.get(wrongAnswer);
                 }
 
@@ -469,6 +476,7 @@ public class Quiz extends BaseLearner {
 
         // wait for close
         for (int i = 0; i < 10; i++) {
+            Log.d(TAG, "waiting for close, " + i);
             if (CommonUtil.findFirstNodeByText(accessibilityService, null, "挑战结束") != null) {
                 CommonUtil.globalBack(accessibilityService, 1000);
                 CommonUtil.globalBack(accessibilityService, 1000);
@@ -481,7 +489,7 @@ public class Quiz extends BaseLearner {
     }
 
     private String normalizeText(String text) {
-        text = text.replaceAll("[`\\\\~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%…&*（）——+|{}《》【】‘；：”“’。，、？\n]", "");
+        text = text.replaceAll("[ `\\\\~!@#$%^&*()+={}':;,\\[\\].<>/?！￥…（）—《》【】‘；：”“’。，、？]", "");
 
         // remove prefix and space
         String firstChar = text.substring(0, 1).toLowerCase(Locale.ROOT);

@@ -79,6 +79,19 @@ public abstract class BaseLearner extends BaseAction {
         return result;
     }
 
+    public boolean findEntrance(String keyword, int x, int y) {
+        if (!enable) {
+            return false;
+        }
+
+        if (findEntrance(keyword)) {
+            return true;
+        }
+
+        GestureUtil.click(accessibilityService, x, y, 1000);
+        return true;
+    }
+
     // return true if has finished processSingle entries
     public void processSingle(String keyword) {
         if (!enable) {

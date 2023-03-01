@@ -35,6 +35,8 @@ public class MyAccessibilityService extends AccessibilityService {
     private WechatScore wechatScore;
     private AlipayScore alipayScore;
 
+    private boolean isTodayPartyStudyDone = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -90,13 +92,18 @@ public class MyAccessibilityService extends AccessibilityService {
             case TYPE_WINDOW_STATE_CHANGED:
                 if (packageName.equalsIgnoreCase("cn.xuexi.android")) {
                     partyStudent.learn();
+                    isTodayPartyStudyDone = partyStudent.isAllDone();
+
+                    Log.d(TAG, "party study done: " + isTodayPartyStudyDone);
                     return;
                 }
 
-                if (packageName.equalsIgnoreCase("com.android.systemui") && className.equalsIgnoreCase("android.widget.FrameLayout")) {
-                    AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(this, null, "取消");
-                    if (node != null && node.isClickable()) {
-                        CommonUtil.click(node, 100);
+                if (packageName.equalsIgnoreCase("com.android.systemui")) {
+                    if (className.equalsIgnoreCase("android.widget.FrameLayout")) {
+                        AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(this, null, "取消");
+                        if (node != null && node.isClickable()) {
+                            CommonUtil.click(node, 100);
+                        }
                     }
 
                     return;
@@ -114,7 +121,9 @@ public class MyAccessibilityService extends AccessibilityService {
 
                 if (packageName.equalsIgnoreCase("com.tencent.mm")) {
 //                    wechatScore.pbcc();
-                    wechatScore.cmbScore();
+//                    wechatScore.cmbScore();
+                    Log.d(TAG, "wechat report:" + isTodayPartyStudyDone);
+                    wechatScore.dailyReport(isTodayPartyStudyDone, partyStudent.getResultLog());
                     return;
                 }
 

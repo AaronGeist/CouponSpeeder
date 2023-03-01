@@ -1,13 +1,17 @@
 package com.shakazxx.couponspeeder.core.wechat;
 
 import android.accessibilityservice.AccessibilityService;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.shakazxx.couponspeeder.core.base.BaseAction;
+import com.shakazxx.couponspeeder.core.party.CommentDict;
 import com.shakazxx.couponspeeder.core.util.CommonUtil;
 import com.shakazxx.couponspeeder.core.util.GestureUtil;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,6 +25,9 @@ public class WechatScore extends BaseAction {
 
     private String password;
 
+    private boolean enableCovid9Report;
+    private boolean enablePartyReport;
+
     public WechatScore(AccessibilityService service, Bundle bundle) {
         super(service);
 
@@ -28,7 +35,88 @@ public class WechatScore extends BaseAction {
             bundle = new Bundle();
         }
 
+        enableCovid9Report = bundle.getBoolean("covid9_report", false);
+        enablePartyReport = bundle.getBoolean("party_report", false);
+
         password = bundle.getString("password");
+    }
+
+    public void sendMessage(String name, String msg, boolean isGroupChat) {
+        boolean isOnChatPage;
+        // 个人和群组有不同的进入方式
+        if (!isGroupChat) {
+            isOnChatPage = enterInto("通讯录") && enterInto(name) && enterInto("发消息");
+        } else {
+            isOnChatPage = enterInto("通讯录") && enterInto("群聊") && enterInto(name);
+        }
+
+        if (isOnChatPage) {
+            AccessibilityNodeInfo inputNode = CommonUtil.findFirstNodeByClassName(accessibilityService, null, "android.widget.EditText");
+            CommonUtil.click(inputNode, 1000);
+
+            CommonUtil.inputText(inputNode, msg);
+            if (!CommonUtil.click(CommonUtil.findFirstNodeByText(accessibilityService, "发送", 2000, 500), 1500)) {
+                // 打开应用后只有第一次可以找到发送按钮，后续只能根据按钮位置点击
+                GestureUtil.click(accessibilityService, 990, 1230, 1500);
+            }
+        }
+        // 回到首页，恢复状态
+        goHomePage();
+    }
+
+    public void dailyReport(boolean isTodayPartyStudyDone, String resultLog) {
+        if (!loginIfNeeded()) {
+            return;
+        }
+        covid9Report();
+
+        partyStudyReport(isTodayPartyStudyDone, resultLog);
+    }
+
+    private void covid9Report() {
+        if (!enableCovid9Report) {
+            return;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("M月d日");
+        String today = sdf.format(new Date());
+        String msg = "周沐唯体温36.7";
+//        sendMessage("哥", msg, false);
+        sendMessage("#2021#中一班", msg, true);
+//        sendMessage("机器人测试", msg, true);
+        sendMessage("哥", today + "幼儿园防疫消息已发", false);
+
+        enableCovid9Report = false;
+    }
+
+    private void partyStudyReport(boolean isTodayPartyStudyDone, String resultLog) {
+        if (!enablePartyReport) {
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("M月d日");
+        String today = sdf.format(new Date());
+        String msg = String.format("[庆祝][庆祝]%s学习强国完成[烟花][烟花]\n%s", today, resultLog);
+        if (!isTodayPartyStudyDone) {
+            msg = String.format("[叹气][叹气]%s学习强国未完成[衰][衰]\n%s", today, resultLog);
+        }
+        sendMessage("姐", msg, false);
+        sendMessage("哥", msg, false);
+
+        enablePartyReport = false;
+    }
+
+    private boolean enterInto(String entryName) {
+        AccessibilityNodeInfo node = CommonUtil.findFirstNodeByText(accessibilityService, entryName, 10000, 1000);
+        if (node == null) {
+            return false;
+        }
+
+        if (!CommonUtil.click(node, 1500)) {
+            Rect rect = new Rect();
+            node.getBoundsInScreen(rect);
+            GestureUtil.click(accessibilityService, (rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2, 1500);
+        }
+        return true;
     }
 
     public void cmbScore() {
